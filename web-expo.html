@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>웹전시관 | 아이스크림 AIDT</title>
+  <style>
+    body { margin:0; font-family:'Noto Sans KR',sans-serif; background:#f8f9fa; }
+    .gnb {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 64px;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .gnb-left {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #1e90ff;
+      cursor: pointer;
+      text-decoration: none;
+      flex: 0 0 auto;
+      margin-right: 48px;
+    }
+    .gnb-center {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      position: static;
+    }
+    .gnb-center a {
+      color: #222;
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .gnb-center a:hover {
+      color: #1e90ff;
+    }
+    .expo-title {
+      font-size:2.2rem; color:#7b6eea; font-weight:bold; text-align:center; margin:48px 0 32px 0;
+    }
+    .expo-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin: 48px 0 32px 0;
+    }
+    .expo-tab {
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(8px);
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(123,110,234,0.08);
+      padding: 18px 38px;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #7b6eea;
+      cursor: pointer;
+      border: none;
+      outline: none;
+      transition: background 0.2s, color 0.2s;
+    }
+    .expo-tab.active {
+      background: #7b6eea;
+      color: #fff;
+    }
+    .expo-section {
+      max-width: 700px;
+      margin: 0 auto 40px auto;
+      display: none;
+    }
+    .expo-card {
+      background:rgba(255,255,255,0.7); backdrop-filter:blur(8px);
+      border-radius:20px; box-shadow:0 2px 12px rgba(123,110,234,0.10);
+      width:320px; min-width:220px; max-width:95vw;
+      display:flex; flex-direction:column; align-items:center; padding:28px 20px 24px 20px; margin-bottom:24px;
+      transition:box-shadow 0.2s, background 0.2s;
+    }
+    .expo-card img {
+      width:100%; max-width:220px; border-radius:12px; margin-bottom:18px; object-fit:cover;
+    }
+    .expo-card-title {
+      font-size:1.18rem; font-weight:700; color:#7b6eea; margin-bottom:10px; text-align:center;
+    }
+    .expo-card-desc {
+      font-size:1.01rem; color:#444; margin-bottom:18px; text-align:center;
+    }
+    .expo-btn {
+      background:#7b6eea; color:#fff; border:none; border-radius:8px; padding:10px 28px; font-size:1.05rem; font-weight:600; cursor:pointer; transition:background 0.2s;
+    }
+    .expo-btn:hover { background:#1e90ff; }
+    @media (max-width:900px) {
+      .gnb { flex-direction: column; height: auto; padding: 0 10px; }
+      .gnb-center {
+        position: static;
+        left: unset;
+        top: unset;
+        transform: none;
+        gap: 16px;
+      }
+      .expo-tabs { flex-direction: column; gap: 16px; }
+      .expo-section { width: 98vw; max-width: 98vw; }
+    }
+    .gnb-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      left: 0;
+      top: 100%;
+      min-width: 120px;
+      background: #fff;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      border-radius: 10px;
+      z-index: 200;
+      padding: 8px 0;
+      margin-top: 0;
+    }
+    .dropdown-content a {
+      display: block;
+      padding: 10px 20px;
+      color: #222;
+      text-decoration: none;
+      font-size: 1rem;
+      transition: background 0.18s, color 0.18s;
+      border-radius: 6px;
+    }
+    .dropdown-content a:hover {
+      background: #f0f4ff;
+      color: #1e90ff;
+    }
+    .gnb-dropdown:hover .dropdown-content,
+    .gnb-dropdown:focus-within .dropdown-content {
+      display: block;
+    }
+    @media (max-width:900px) {
+      .dropdown-content {
+        left: 0;
+        min-width: 100px;
+      }
+    }
+    /* index.html의 플로팅 메뉴 스타일 전체 복사 */
+    .floating-menu {
+      position: fixed;
+      top: 120px;
+      left: 32px;
+      z-index: 200;
+      background: rgba(255,255,255,0.18);
+      border-radius: 22px;
+      box-shadow: 0 8px 32px 0 rgba(31,38,135,0.18);
+      padding: 32px 28px;
+      width: 260px;
+      backdrop-filter: blur(16px);
+      border: 1.5px solid rgba(255,255,255,0.25);
+      transition: background 0.2s, box-shadow 0.2s, opacity 0.2s;
+      opacity: 1;
+    }
+    .floating-menu.hide {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .timeline-menu {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      position: relative;
+    }
+    .timeline-menu::before {
+      content: "";
+      position: absolute;
+      left: 24px;
+      top: 0;
+      bottom: 0;
+      width: 2.5px;
+      background: #c6e4ea;
+      z-index: 0;
+    }
+    .timeline-menu li {
+      position: relative;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      margin-bottom: 18px;
+      padding: 0;
+    }
+    .timeline-menu li:last-child {
+      margin-bottom: 0;
+    }
+    .timeline-menu li::before {
+      content: "";
+      position: absolute;
+      left: 17px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      background: #c6e4ea;
+      border-radius: 50%;
+      z-index: 1;
+      border: 2.5px solid #e0f7fa;
+    }
+    .timeline-menu a {
+      display: block;
+      margin-left: 44px;
+      padding: 12px 28px;
+      font-size: 1.08rem;
+      font-weight: 600;
+      color: #333;
+      border-radius: 999px;
+      text-decoration: none;
+      transition: background 0.2s, color 0.2s;
+      position: relative;
+      z-index: 2;
+      background: none;
+      box-shadow: none;
+      white-space: nowrap;
+    }
+    .timeline-menu a.active, .timeline-menu a:hover {
+      background: linear-gradient(90deg, #1ec9ff 0%, #3be6c6 100%);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(30,201,255,0.10);
+    }
+    @media (max-width: 1100px) {
+      .floating-menu { display: none; }
+    }
+    .floating-label {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #7b6eea;
+      text-align: left;
+      margin-bottom: 22px;
+      letter-spacing: -1px;
+      padding-left: 4px;
+    }
+    .expo-btn.sub-btn {
+      background: #fff;
+      color: #1ec9a8;
+      border: 1.5px solid #1ec9a8;
+      font-size: 0.98rem;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: background 0.18s, color 0.18s;
+      margin-bottom: 0;
+    }
+    .expo-btn.sub-btn:hover {
+      background: #e0fff7;
+      color: #0e8c6f;
+      border-color: #0e8c6f;
+    }
+    /* 맨 위로 버튼 스타일 */
+    #scrollTopBtn {
+      display: none;
+      position: fixed;
+      right: 32px;
+      bottom: 32px;
+      z-index: 300;
+      background: #7b6eea;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 54px;
+      height: 54px;
+      font-size: 1.6rem;
+      font-weight: bold;
+      box-shadow: 0 4px 16px rgba(123,110,234,0.18);
+      cursor: pointer;
+      transition: background 0.18s, box-shadow 0.18s, opacity 0.18s;
+      opacity: 0.92;
+    }
+    #scrollTopBtn:hover {
+      background: #4b3ea7;
+      box-shadow: 0 8px 24px rgba(123,110,234,0.28);
+      opacity: 1;
+    }
+    .aidt-exp-btn {
+      display: inline-block;
+      font-size: 1.18rem;
+      font-weight: 700;
+      padding: 18px 38px;
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(123,110,234,0.10);
+      color: #fff;
+      text-decoration: none;
+      transition: background 0.18s, box-shadow 0.18s, transform 0.18s;
+      margin-bottom: 0;
+    }
+    .aidt-exp-btn.teacher-btn {
+      background: linear-gradient(90deg,#7b6eea 0%,#4b3ea7 100%);
+    }
+    .aidt-exp-btn.teacher-btn:hover {
+      background: linear-gradient(90deg,#4b3ea7 0%,#7b6eea 100%);
+      transform: translateY(-2px) scale(1.04);
+    }
+    .aidt-exp-btn.student-btn {
+      background: linear-gradient(90deg,#1ec9a8 0%,#0e8c6f 100%);
+    }
+    .aidt-exp-btn.student-btn:hover {
+      background: linear-gradient(90deg,#0e8c6f 0%,#1ec9a8 100%);
+      transform: translateY(-2px) scale(1.04);
+    }
+    .floating-apply-btn {
+      position: fixed;
+      right: 32px;
+      bottom: 32px;
+      z-index: 500;
+      background: linear-gradient(90deg,#7b6eea 0%,#1ec9a8 100%);
+      color: #fff;
+      font-size: 1.13rem;
+      font-weight: 700;
+      padding: 20px 38px;
+      border-radius: 32px;
+      box-shadow: 0 4px 24px rgba(123,110,234,0.18);
+      border: none;
+      cursor: pointer;
+      transition: background 0.18s, box-shadow 0.18s, transform 0.18s;
+      outline: none;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .floating-apply-btn:hover {
+      background: linear-gradient(90deg,#1ec9a8 0%,#7b6eea 100%);
+      box-shadow: 0 8px 32px rgba(30,201,255,0.18);
+      transform: translateY(-2px) scale(1.04);
+    }
+    @media (max-width: 700px) {
+      .floating-apply-btn { right: 12px; bottom: 12px; padding: 14px 18px; font-size: 1rem; }
+    }
+    
+    /* 히어로 섹션 반응형 */
+    @media (max-width: 768px) {
+      .hero-section h1 {
+        font-size: 2.2rem !important;
+      }
+      .hero-section p {
+        font-size: 1.1rem !important;
+      }
+      .hero-section > div > div {
+        flex-direction: column;
+        gap: 15px;
+      }
+      .hero-section > div > div > div {
+        padding: 20px 24px;
+      }
+    }
+    
+    /* 소개 섹션 반응형 */
+    @media (max-width: 768px) {
+      .intro-section h2 {
+        font-size: 1.8rem !important;
+      }
+      .intro-section .grid {
+        grid-template-columns: 1fr !important;
+        gap: 20px !important;
+      }
+      .intro-section .grid > div {
+        padding: 30px 20px !important;
+      }
+    }
+    
+    /* AI 기능 체험 섹션 반응형 */
+    @media (max-width: 768px) {
+      .feature-btn {
+        padding: 12px 18px !important;
+        font-size: 0.9rem !important;
+      }
+      #feature-description {
+        padding: 30px 20px !important;
+        min-height: 250px !important;
+      }
+      #feature-description > div > div {
+        flex-direction: column !important;
+        text-align: center !important;
+      }
+      #feature-description > div > div > div:first-child {
+        margin-right: 0 !important;
+        margin-bottom: 15px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="gnb">
+    <a class="gnb-left" href="index.html">아이스크림 AIDT</a>
+    <div class="gnb-center">
+      <a href="ai-tech.html">AI 기술</a>
+      <div class="gnb-dropdown">
+        <a href="web-expo.html" class="dropdown-toggle" tabindex="-1" style="color:#7b6eea;font-weight:700;">웹전시관</a>
+      </div>
+      <a href="contact.html">문의하기</a>
+      <a href="teacher-training.html">교원 연수</a>
+    </div>
+  </nav>
+  <!-- 플로팅 사이드 메뉴 (index.html 방식) -->
+  <nav class="floating-menu hide" id="floatingMenu">
+    <div class="floating-label" id="floatingLabel">영어관</div>
+    <ul class="timeline-menu">
+      <li><a href="#english-prep" id="menu-prep">수업 준비</a></li>
+      <li><a href="#english-class" id="menu-class">수업 시간</a></li>
+      <li><a href="#english-guide" id="menu-guide">맞춤 학습 지도</a></li>
+      <li><a href="#aidt-experience" id="menu-experience">AIDT 영어관 체험</a></li>
+    </ul>
+  </nav>
+  <!-- 히어로 섹션 추가 -->
+  <section style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 80px 0 60px 0; text-align: center;">
+    <div style="max-width: 1400px; margin: 0 auto; padding: 0 20px;">
+      <h1 style="font-size: 3rem; font-weight: 700; margin-bottom: 20px; letter-spacing: -1px;">AI 디지털교과서 웹전시관</h1>
+      <p style="font-size: 1.3rem; opacity: 0.9; margin-bottom: 40px; line-height: 1.6;">미래 교육의 새로운 경험을 만나보세요<br>AI 기술로 구현된 혁신적인 디지털교과서의 모든 것</p>
+      <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 16px; padding: 24px 32px; border: 1px solid rgba(255,255,255,0.2);">
+          <div style="font-size: 2rem; margin-bottom: 8px;">🎯</div>
+          <div style="font-size: 1.1rem; font-weight: 600;">맞춤형 학습</div>
+          <div style="font-size: 0.9rem; opacity: 0.8;">AI가 분석한 개인별 맞춤 교육</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 16px; padding: 24px 32px; border: 1px solid rgba(255,255,255,0.2);">
+          <div style="font-size: 2rem; margin-bottom: 8px;">🚀</div>
+          <div style="font-size: 1.1rem; font-weight: 600;">실시간 피드백</div>
+          <div style="font-size: 0.9rem; opacity: 0.8;">즉시 확인하는 학습 결과</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 16px; padding: 24px 32px; border: 1px solid rgba(255,255,255,0.2);">
+          <div style="font-size: 2rem; margin-bottom: 8px;">💡</div>
+          <div style="font-size: 1.1rem; font-weight: 600;">인터랙티브 콘텐츠</div>
+          <div style="font-size: 0.9rem; opacity: 0.8;">몰입감 있는 학습 경험</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 소개 섹션 추가 -->
+  <section style="background: #fff; padding: 60px 0; margin: 0;">
+    <div style="max-width: 1400px; margin: 0 auto; padding: 0 20px;">
+      <div style="text-align: center; margin-bottom: 50px;">
+        <h2 style="font-size: 2.2rem; color: #333; font-weight: 700; margin-bottom: 20px;">왜 아이스크림 AIDT인가?</h2>
+        <p style="font-size: 1.1rem; color: #666; line-height: 1.6; max-width: 800px; margin: 0 auto;">AI 기술이 적용된 디지털교과서의 혁신적인 기능들을 직접 체험해보세요.<br>교사와 학생 모두를 위한 맞춤형 학습 환경을 제공합니다.</p>
+      </div>
+      
+      <!-- AI 기능 체험 섹션 추가 -->
+      <div style="text-align: center; margin-bottom: 60px;">
+        <h3 style="font-size: 1.8rem; color: #7b6eea; font-weight: 700; margin-bottom: 30px;">AI 기능 체험하기</h3>
+        <p style="font-size: 1.1rem; color: #666; margin-bottom: 40px;">아래 기능을 클릭하여 AIDT의 혁신적인 AI 기능들을 직접 확인해보세요</p>
+        
+        <!-- 기능 설명 영역 -->
+        <div id="feature-description" style="background: linear-gradient(135deg, #f8f9ff 0%, #e3f0ff 100%); border-radius: 20px; padding: 40px; margin-bottom: 30px; box-shadow: 0 4px 20px rgba(123,110,234,0.08); min-height: 250px; display: flex; align-items: center; justify-content: center;">
+          <div style="text-align: center; color: #666;">
+            <div style="font-size: 4rem; margin-bottom: 20px;">👆</div>
+            <div style="font-size: 1.3rem; font-weight: 600; color: #7b6eea; margin-bottom: 12px;">기능을 선택해주세요</div>
+            <div style="font-size: 1.1rem; line-height: 1.5;">아래 버튼 중 하나를 클릭하면<br>해당 기능의 상세 내용을 확인할 수 있습니다</div>
+          </div>
+        </div>
+        
+        <!-- 기능 선택 버튼들 -->
+        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
+          <button class="feature-btn active" data-feature="ai-assistant" style="background: #7b6eea; color: white; border: none; border-radius: 12px; padding: 15px 25px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(123,110,234,0.2);">
+            AI 보조교사 지원
+          </button>
+          <button class="feature-btn" data-feature="content" style="background: #e9ecef; color: #666; border: none; border-radius: 12px; padding: 15px 25px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+            교육용 콘텐츠 제공
+          </button>
+          <button class="feature-btn" data-feature="analysis" style="background: #e9ecef; color: #666; border: none; border-radius: 12px; padding: 15px 25px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+            학습 성취도 분석
+          </button>
+          <button class="feature-btn" data-feature="monitoring" style="background: #e9ecef; color: #666; border: none; border-radius: 12px; padding: 15px 25px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+            실시간 학습 점검
+          </button>
+          <button class="feature-btn" data-feature="care" style="background: #e9ecef; color: #666; border: none; border-radius: 12px; padding: 15px 25px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+            학생 정서 케어
+          </button>
+        </div>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-bottom: 50px;">
+        <div style="background: linear-gradient(135deg, #f8f9ff 0%, #e3f0ff 100%); border-radius: 20px; padding: 40px 30px; text-align: center; box-shadow: 0 4px 20px rgba(123,110,234,0.08);">
+          <div style="font-size: 3rem; margin-bottom: 20px;">👨‍🏫</div>
+          <h3 style="font-size: 1.4rem; color: #7b6eea; font-weight: 700; margin-bottom: 15px;">교사를 위한 AI 도구</h3>
+          <p style="color: #666; line-height: 1.6;">AI 보조교사, 자동 평가, 맞춤형 수업 자료 제공으로<br>효율적인 수업 운영을 지원합니다.</p>
+        </div>
+        <div style="background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%); border-radius: 20px; padding: 40px 30px; text-align: center; box-shadow: 0 4px 20px rgba(30,144,255,0.08);">
+          <div style="font-size: 3rem; margin-bottom: 20px;">👨‍🎓</div>
+          <h3 style="font-size: 1.4rem; color: #1e90ff; font-weight: 700; margin-bottom: 15px;">학생을 위한 맞춤 학습</h3>
+          <p style="color: #666; line-height: 1.6;">개인별 학습 수준에 맞는 콘텐츠와<br>실시간 피드백으로 효과적인 학습을 도와줍니다.</p>
+        </div>
+        <div style="background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-radius: 20px; padding: 40px 30px; text-align: center; box-shadow: 0 4px 20px rgba(255,193,7,0.08);">
+          <div style="font-size: 3rem; margin-bottom: 20px;">📊</div>
+          <h3 style="font-size: 1.4rem; color: #f39c12; font-weight: 700; margin-bottom: 15px;">데이터 기반 분석</h3>
+          <p style="color: #666; line-height: 1.6;">학습 과정과 결과를 실시간으로 분석하여<br>개선점과 발전 방향을 제시합니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 웹전시관 타이틀+카드 일반 div로 복구 -->
+  <div class="expo-sticky-wrap" style="background:#f8f9fa;box-shadow:0 2px 8px rgba(0,0,0,0.04);padding-top:12px;">
+    <div class="expo-title">전시관 둘러보기</div>
+            <div class="expo-list" style="display:flex; gap:32px; flex-wrap:wrap; justify-content:center; max-width:1400px; margin:0 auto 60px auto;">
+      <div class="expo-card" id="english-card">
+        <img src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80" alt="영어 전시관">
+        <div class="expo-card-title">영어</div>
+        <div class="expo-card-desc">AI 디지털교과서 영어관에서 다양한 영어 학습 자료와 체험을 만나보세요.</div>
+        <div style="display:flex;gap:10px;justify-content:center;margin-bottom:10px;">
+          <a href="#" class="expo-btn sub-btn">교과서 목차</a>
+          <a href="#" class="expo-btn sub-btn">선정 사유서</a>
+        </div>
+        <a href="#english-detail" class="expo-btn" id="show-english-detail">영어관 바로가기</a>
+      </div>
+      <div class="expo-card">
+        <img src="https://images.unsplash.com/photo-1513258496099-48168024aec0?auto=format&fit=crop&w=400&q=80" alt="수학 전시관">
+        <div class="expo-card-title">수학</div>
+        <div class="expo-card-desc">AI 디지털교과서 수학관에서 다양한 수학 학습 자료와 체험을 만나보세요.</div>
+        <div style="display:flex;gap:10px;justify-content:center;margin-bottom:10px;">
+          <a href="#" class="expo-btn sub-btn">교과서 목차</a>
+          <a href="#" class="expo-btn sub-btn">선정 사유서</a>
+        </div>
+        <a href="#math-detail" class="expo-btn" id="show-math-detail">수학관 바로가기</a>
+      </div>
+    </div>
+  </div>
+  <!-- 영어관 상세: 처음엔 숨김, 버튼 클릭 시 보임 -->
+          <div id="english-detail" style="display:none;max-width:1400px;margin:0 auto 60px auto;">
+    <!-- 수업 준비 -->
+    <section id="english-prep" style="background:linear-gradient(135deg,#e3f0ff 0%,#f8f9ff 100%);border-radius:24px;padding:56px 0 48px 0;margin-bottom:48px;box-shadow:0 4px 24px rgba(123,110,234,0.08);">
+      <h2 style="font-size:2.3rem;color:#222;font-weight:700;margin-bottom:40px;text-align:center;letter-spacing:-1px;">수업 준비</h2>
+      <div style="display:flex;flex-direction:column;gap:2.5rem;max-width:900px;margin:0 auto;">
+        <!-- AI 보조교사 지원 -->
+        <div style="background:#fff;border-radius:20px;box-shadow:0 2px 12px rgba(123,110,234,0.10);display:flex;flex-direction:column;align-items:center;padding:36px 28px 32px 28px;min-height:370px;">
+          <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80" alt="AI 보조교사 지원" style="width:100%;height:150px;object-fit:cover;border-radius:14px;margin-bottom:20px;">
+          <div style="width:100%;text-align:left;">
+            <div style="font-size:1.22rem;font-weight:700;color:#7b6eea;margin-bottom:14px;">AI 보조교사 지원</div>
+            <ul style="padding-left:18px;margin:0 0 0 0;list-style:disc;color:#555;font-size:1.08rem;line-height:1.8;">
+              <li>영어 학습 문장을 바로 만들어 드려요.<br><span style="color:#888;font-size:0.98rem;">AI 보조교사 아이쌤이 원하는 카테고리와 사진을 골라 3가지 문장을 제공합니다.</span></li>
+              <li>영상에 맞는 대화문을 다양하게 받아 봐요.<br><span style="color:#888;font-size:0.98rem;">교과서 동영상으로 영어 대화문을 생성, AI가 영상을 학습해 또 다른 대화문을 제공합니다.</span></li>
+              <li>특별한 영어 사전을 활용해 보세요.<br><span style="color:#888;font-size:0.98rem;">한글/영어 단어 검색 시 발음, 발음 영상, 필기 영상, 3개국 억양 제공.</span></li>
+            </ul>
+          </div>
+        </div>
+        <!-- 교육용 콘텐츠 제공 -->
+        <div style="background:#fff;border-radius:20px;box-shadow:0 2px 12px rgba(123,110,234,0.10);display:flex;flex-direction:column;align-items:center;padding:36px 28px 32px 28px;min-height:370px;">
+          <img src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=600&q=80" alt="교육용 콘텐츠 제공" style="width:100%;height:150px;object-fit:cover;border-radius:14px;margin-bottom:20px;">
+          <div style="width:100%;text-align:left;">
+            <div style="font-size:1.22rem;font-weight:700;color:#7b6eea;margin-bottom:14px;">교육용 콘텐츠 제공</div>
+            <ul style="padding-left:18px;margin:0 0 0 0;list-style:disc;color:#555;font-size:1.08rem;line-height:1.8;">
+              <li>수 천장의 교육용 이미지가 있어요.<br><span style="color:#888;font-size:0.98rem;">수업 자료실에서 원하는 키워드로 자료를 검색, 다양한 이미지 제공.</span></li>
+              <li>화이트 보드로 학생들과 함께 자료를 만들어요.<br><span style="color:#888;font-size:0.98rem;">표현 도구로 펜 색상/굵기 조절, 템플릿 추가, 결과물 저장 가능.</span></li>
+              <li>AI의 수업 보탬 자료는 어때요?<br><span style="color:#888;font-size:0.98rem;">반 평균 성취도에 따라 AI가 어휘 카드, 놀이 자료, 듣기 자료 등 추천.</span></li>
+            </ul>
+          </div>
+        </div>
+        <!-- 학습 성취도 분석 -->
+        <div style="background:#fff;border-radius:20px;box-shadow:0 2px 12px rgba(123,110,234,0.10);display:flex;flex-direction:column;align-items:center;padding:36px 28px 32px 28px;min-height:370px;">
+          <img src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80" alt="학습 성취도 분석" style="width:100%;height:150px;object-fit:cover;border-radius:14px;margin-bottom:20px;">
+          <div style="width:100%;text-align:left;">
+            <div style="font-size:1.22rem;font-weight:700;color:#7b6eea;margin-bottom:14px;">학습 성취도 분석</div>
+            <ul style="padding-left:18px;margin:0 0 0 0;list-style:disc;color:#555;font-size:1.08rem;line-height:1.8;">
+              <li>매일 학습 이력을 분석해요.<br><span style="color:#888;font-size:0.98rem;">수업 날짜/단원/차시별로 학업성취율을 5개 그룹으로 표시, 이력 관찰.</span></li>
+              <li>AI가 수준별 맞춤 과제를 제공해요.<br><span style="color:#888;font-size:0.98rem;">학생별/그룹별로 AI가 맞춤 과제, 단원 평가 문제를 출제.</span></li>
+              <li>누가 우리 반 성실 왕일까?<br><span style="color:#888;font-size:0.98rem;">AI 기능으로 학생별 문제 풀이, 연습, 성실도 등 다양한 영역 분석.</span></li>
+            </ul>
+          </div>
+        </div>
+        <!-- 수업 맞춤 환경 설정 -->
+        <div style="background:#fff;border-radius:20px;box-shadow:0 2px 12px rgba(123,110,234,0.10);display:flex;flex-direction:column;align-items:center;padding:36px 28px 32px 28px;min-height:370px;">
+          <img src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=600&q=80" alt="수업 맞춤 환경 설정" style="width:100%;height:150px;object-fit:cover;border-radius:14px;margin-bottom:20px;">
+          <div style="width:100%;text-align:left;">
+            <div style="font-size:1.22rem;font-weight:700;color:#7b6eea;margin-bottom:14px;">수업 맞춤 환경 설정</div>
+            <ul style="padding-left:18px;margin:0 0 0 0;list-style:disc;color:#555;font-size:1.08rem;line-height:1.8;">
+              <li>선생님만의 교과서를 구성해 보세요.<br><span style="color:#888;font-size:0.98rem;">차시 추가, 외부 자료 첨부, 우리 반 맞춤 교과서 제작.</span></li>
+              <li>딱 필요한 메뉴만 남기세요.<br><span style="color:#888;font-size:0.98rem;">교사용/학생용 화면, 챗봇, 시작화면 등 메뉴 자유 설정.</span></li>
+              <li>학생별로 교과서의 언어를 다르게 설정해요.<br><span style="color:#888;font-size:0.98rem;">한국어, 영어, 일본어, 중국어, 베트남어, 필리핀어 지원.</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- 수업 시간 -->
+    <section id="english-class" style="background:linear-gradient(135deg,#e0fff7 0%,#fffbe6 100%);border-radius:24px;padding:56px 0 48px 0;margin-bottom:48px;box-shadow:0 4px 24px rgba(123,110,234,0.08);">
+      <h2 style="font-size:2.3rem;color:#222;font-weight:700;margin-bottom:40px;text-align:center;letter-spacing:-1px;">수업 시간</h2>
+      <div style="display:flex;flex-direction:column;gap:2.5rem;max-width:900px;margin:0 auto;">
+        <!-- 모니터링 기능 -->
+        <div style="background:#fff;border-radius:20px;box-shadow:0 2px 12px rgba(123,110,234,0.10);display:flex;flex-direction:column;align-items:center;padding:36px 28px 32px 28px;min-height:370px;">
+          <img src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=600&q=80" alt="모니터링 기능" style="width:100%;height:150px;object-fit:cover;border-radius:14px;margin-bottom:20px;">
+          <div style="width:100%;text-align:left;">
+            <div style="font-size:1.22rem;font-weight:700;color:#7b6eea;margin-bottom:14px;">모니터링 기능</div>
+            <ul style="padding-left:18px;margin:0 0 0 0;list-style:disc;color:#555;font-size:1.08rem;line-height:1.8;">
+              <li>학생별 학습 현황을 실시간으로 모니터링</li>
+              <li>과제 응시 여부, 학습 진행 상황, 발음 평가 결과 등 한눈에 확인</li>
+              <li>학생별 학습 데이터 기반 맞춤 피드백 제공</li>
+            </ul>
+          </div>
+        </div>
+        <!-- 활동형 수업 진행 -->
+        <div style="background:#fff;border-radius:20px;box-shadow:0 2px 12px rgba(123,110,234,0.10);display:flex;flex-direction:column;align-items:center;padding:36px 28px 32px 28px;min-height:370px;">
+          <img src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80" alt="활동형 수업 진행" style="width:100%;height:150px;object-fit:cover;border-radius:14px;margin-bottom:20px;">
+          <div style="width:100%;text-align:left;">
+            <div style="font-size:1.22rem;font-weight:700;color:#7b6eea;margin-bottom:14px;">활동형 수업 진행</div>
+            <ul style="padding-left:18px;margin:0 0 0 0;list-style:disc;color:#555;font-size:1.08rem;line-height:1.8;">
+              <li>타이머, 주사위, OX/객관식/주관식 퀴즈 등 다양한 활동형 수업 도구 제공</li>
+              <li>학생 참여를 유도하고 수업 집중도 향상</li>
+              <li>실시간 반응형 수업으로 학습 효과 극대화</li>
+            </ul>
+          </div>
+        </div>
+        <!-- 실시간 학습 점검 -->
+        <div style="background:#fff;border-radius:20px;box-shadow:0 2px 12px rgba(123,110,234,0.10);display:flex;flex-direction:column;align-items:center;padding:36px 28px 32px 28px;min-height:370px;">
+          <img src="https://images.unsplash.com/photo-1511367461989-f85a21fda167?auto=format&fit=crop&w=600&q=80" alt="실시간 학습 점검" style="width:100%;height:150px;object-fit:cover;border-radius:14px;margin-bottom:20px;">
+          <div style="width:100%;text-align:left;">
+            <div style="font-size:1.22rem;font-weight:700;color:#7b6eea;margin-bottom:14px;">실시간 학습 점검</div>
+            <ul style="padding-left:18px;margin:0 0 0 0;list-style:disc;color:#555;font-size:1.08rem;line-height:1.8;">
+              <li>수업 중 AI가 학생들의 학습을 실시간으로 점검</li>
+              <li>수업 종료 전 단어 맞추기, 집중력 향상 활동</li>
+              <li>매시간 학습 이력 저장 및 분석</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- 맞춤 학습 지도 -->
+    <section id="english-guide" style="background:linear-gradient(135deg,#f3eaff 0%,#ffeaf4 100%);border-radius:24px;padding:56px 0 48px 0;margin-bottom:48px;box-shadow:0 4px 24px rgba(123,110,234,0.08);">
+      <h2 style="font-size:2.3rem;color:#222;font-weight:700;margin-bottom:40px;text-align:center;letter-spacing:-1px;">맞춤 학습 지도</h2>
+      <div style="display:flex;flex-direction:column;gap:2.5rem;max-width:900px;margin:0 auto;">
+        <!-- 학생 정서 케어 -->
+        <div style="background:#fff;border-radius:20px;box-shadow:0 2px 12px rgba(123,110,234,0.10);display:flex;flex-direction:column;align-items:center;padding:36px 28px 32px 28px;min-height:370px;">
+          <img src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80" alt="학생 정서 케어" style="width:100%;height:150px;object-fit:cover;border-radius:14px;margin-bottom:20px;">
+          <div style="width:100%;text-align:left;">
+            <div style="font-size:1.22rem;font-weight:700;color:#7b6eea;margin-bottom:14px;">학생 정서 케어</div>
+            <ul style="padding-left:18px;margin:0 0 0 0;list-style:disc;color:#555;font-size:1.08rem;line-height:1.8;">
+              <li>학생의 마음까지 먼저 알고 케어해요.<br><span style="color:#888;font-size:0.98rem;">감정 날씨 체크, 설문, 메시지 등으로 정서와 습관 관리.</span></li>
+              <li>어떤 기분으로 이번 단원을 공부했을까?<br><span style="color:#888;font-size:0.98rem;">단원 학습 후 설문으로 학생의 정서와 이해도 파악.</span></li>
+            </ul>
+          </div>
+        </div>
+        <!-- 학습 생활 관리 -->
+        <div style="background:#fff;border-radius:20px;box-shadow:0 2px 12px rgba(123,110,234,0.10);display:flex;flex-direction:column;align-items:center;padding:36px 28px 32px 28px;min-height:370px;">
+          <img src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=600&q=80" alt="학습 생활 관리" style="width:100%;height:150px;object-fit:cover;border-radius:14px;margin-bottom:20px;">
+          <div style="width:100%;text-align:left;">
+            <div style="font-size:1.22rem;font-weight:700;color:#7b6eea;margin-bottom:14px;">학습 생활 관리</div>
+            <ul style="padding-left:18px;margin:0 0 0 0;list-style:disc;color:#555;font-size:1.08rem;line-height:1.8;">
+              <li>학생들의 과제를 꼼꼼히 관리해요.<br><span style="color:#888;font-size:0.98rem;">과제 응시 여부 확인, AI 추천 자료, 단원 평가 관리.</span></li>
+              <li>독려가 필요한 학생에게 메시지를 보내요.<br><span style="color:#888;font-size:0.98rem;">AI가 과제를 풀지 않은 학생에게 맞춤 메시지 전송.</span></li>
+            </ul>
+          </div>
+        </div>
+        <!-- 디지털 생활기록부 -->
+        <div style="background:#fff;border-radius:20px;box-shadow:0 2px 12px rgba(123,110,234,0.10);display:flex;flex-direction:column;align-items:center;padding:36px 28px 32px 28px;min-height:370px;">
+          <img src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80" alt="디지털 생활기록부" style="width:100%;height:150px;object-fit:cover;border-radius:14px;margin-bottom:20px;">
+          <div style="width:100%;text-align:left;">
+            <div style="font-size:1.22rem;font-weight:700;color:#7b6eea;margin-bottom:14px;">디지털 생활기록부</div>
+            <ul style="padding-left:18px;margin:0 0 0 0;list-style:disc;color:#555;font-size:1.08rem;line-height:1.8;">
+              <li>학생의 학습 이력을 한눈에 파악해요.<br><span style="color:#888;font-size:0.98rem;">학기말에 생활기록부로 실력 변화, 공부 패턴, 발음 실력 등 제공.</span></li>
+              <li>영어 발음 실력이 얼마나 발전했나 확인해요.<br><span style="color:#888;font-size:0.98rem;">AI가 발음 정확성, 강세, 리듬까지 분석해 그래프로 제공.</span></li>
+              <li>요일별 공부 패턴까지 알려줘요.<br><span style="color:#888;font-size:0.98rem;">요일별 공부 시간, 단어 이해도, 활용도 등 세심하게 지도.</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- 실제 AIDT 영어관 체험 섹션 -->
+    <section id="aidt-experience" style="background:linear-gradient(135deg,#f8f9ff 0%,#e3f0ff 100%);border-radius:24px;padding:56px 0 48px 0;margin-bottom:48px;box-shadow:0 4px 24px rgba(123,110,234,0.08);max-width:1400px;margin:0 auto 60px auto;">
+      <h2 style="font-size:2.1rem;color:#222;font-weight:700;margin-bottom:40px;text-align:center;letter-spacing:-1px;">AIDT 영어관 체험</h2>
+      <div class="aidt-experience-btns" style="display:flex;gap:24px;justify-content:center;margin-bottom:36px;">
+        <a href="https://2v8p.aidt.me/classrooms/6383/chapters/204?role=teacher" target="_blank" class="aidt-exp-btn teacher-btn">선생님 체험하기</a>
+        <a href="https://2v8p.aidt.me/classrooms/6383/chapters/204?role=student" target="_blank" class="aidt-exp-btn student-btn">학생 체험하기</a>
+      </div>
+      <!-- 이하 기존 단원별 카드 ... -->
+    </section>
+  </div>
+  <!-- 수학관 상세: 처음엔 숨김, 버튼 클릭 시 보임 -->
+          <div id="math-detail" style="display:none;max-width:1400px;margin:0 auto 60px auto;">
+    <!-- 수학관 수업 준비 -->
+    <section id="math-prep" style="background:linear-gradient(135deg,#e3f0ff 0%,#f8f9ff 100%);border-radius:24px;padding:56px 0 48px 0;margin-bottom:48px;box-shadow:0 4px 24px rgba(123,110,234,0.08);">
+      <h2 style="font-size:2.3rem;color:#222;font-weight:700;margin-bottom:40px;text-align:center;letter-spacing:-1px;">수업 준비</h2>
+      <div style="display:flex;flex-direction:column;gap:2.5rem;max-width:900px;margin:0 auto;">
+        <div style="background:#fff;border-radius:20px;box-shadow:0 2px 12px rgba(123,110,234,0.10);display:flex;flex-direction:column;align-items:center;padding:36px 28px 32px 28px;min-height:370px;">
+          <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80" alt="AI 수학 보조교사" style="width:100%;height:150px;object-fit:cover;border-radius:14px;margin-bottom:20px;">
+          <div style="width:100%;text-align:left;">
+            <div style="font-size:1.22rem;font-weight:700;color:#7b6eea;margin-bottom:14px;">AI 수학 보조교사 지원</div>
+            <ul style="padding-left:18px;margin:0 0 0 0;list-style:disc;color:#555;font-size:1.08rem;line-height:1.8;">
+              <li>수학 문제 자동 생성 및 난이도 조절</li>
+              <li>수업 자료(도형, 그래프 등) AI 추천</li>
+              <li>학생별 맞춤 수학 학습 자료 제공</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- 수학관 수업 시간 -->
+    <section id="math-class" style="background:linear-gradient(135deg,#e0fff7 0%,#fffbe6 100%);border-radius:24px;padding:56px 0 48px 0;margin-bottom:48px;box-shadow:0 4px 24px rgba(123,110,234,0.08);">
+      <h2 style="font-size:2.3rem;color:#222;font-weight:700;margin-bottom:40px;text-align:center;letter-spacing:-1px;">수업 시간</h2>
+      <div style="display:flex;flex-direction:column;gap:2.5rem;max-width:900px;margin:0 auto;">
+        <div style="background:#fff;border-radius:20px;box-shadow:0 2px 12px rgba(123,110,234,0.10);display:flex;flex-direction:column;align-items:center;padding:36px 28px 32px 28px;min-height:370px;">
+          <img src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80" alt="수학 활동형 수업" style="width:100%;height:150px;object-fit:cover;border-radius:14px;margin-bottom:20px;">
+          <div style="width:100%;text-align:left;">
+            <div style="font-size:1.22rem;font-weight:700;color:#7b6eea;margin-bottom:14px;">활동형 수업 진행</div>
+            <ul style="padding-left:18px;margin:0 0 0 0;list-style:disc;color:#555;font-size:1.08rem;line-height:1.8;">
+              <li>수학 게임, 퀴즈, 실험 등 다양한 활동 제공</li>
+              <li>실시간 풀이 과정 모니터링</li>
+              <li>학생 참여 유도 및 수업 집중도 향상</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- 수학관 맞춤 학습 지도 -->
+    <section id="math-guide" style="background:linear-gradient(135deg,#f3eaff 0%,#ffeaf4 100%);border-radius:24px;padding:56px 0 48px 0;margin-bottom:48px;box-shadow:0 4px 24px rgba(123,110,234,0.08);">
+      <h2 style="font-size:2.3rem;color:#222;font-weight:700;margin-bottom:40px;text-align:center;letter-spacing:-1px;">맞춤 학습 지도</h2>
+      <div style="display:flex;flex-direction:column;gap:2.5rem;max-width:900px;margin:0 auto;">
+        <div style="background:#fff;border-radius:20px;box-shadow:0 2px 12px rgba(123,110,234,0.10);display:flex;flex-direction:column;align-items:center;padding:36px 28px 32px 28px;min-height:370px;">
+          <img src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=600&q=80" alt="수학 맞춤 지도" style="width:100%;height:150px;object-fit:cover;border-radius:14px;margin-bottom:20px;">
+          <div style="width:100%;text-align:left;">
+            <div style="font-size:1.22rem;font-weight:700;color:#7b6eea;margin-bottom:14px;">맞춤 학습 지도</div>
+            <ul style="padding-left:18px;margin:0 0 0 0;list-style:disc;color:#555;font-size:1.08rem;line-height:1.8;">
+              <li>학생별 수학 학습 이력 분석</li>
+              <li>AI 기반 취약 개념 진단 및 보충</li>
+              <li>개별 피드백 및 성장 리포트 제공</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- 실제 AIDT 수학관 체험 섹션 (영어관과 구조 동일, 내용은 임시) -->
+    <section id="aidt-math-experience" style="background:linear-gradient(135deg,#f8f9ff 0%,#e3f0ff 100%);border-radius:24px;padding:56px 0 48px 0;margin-bottom:48px;box-shadow:0 4px 24px rgba(123,110,234,0.08);max-width:1400px;margin:0 auto 60px auto;">
+      <h2 style="font-size:2.1rem;color:#222;font-weight:700;margin-bottom:40px;text-align:center;letter-spacing:-1px;">AIDT 수학관 체험</h2>
+      <div style="display:flex;flex-direction:column;gap:40px;">
+        <!-- 1단원 예시 -->
+        <div>
+          <div style="font-size:1.18rem;font-weight:700;color:#1ec9a8;margin-bottom:18px;">1단원 수와 연산</div>
+          <div style="display:flex;gap:24px;flex-wrap:wrap;">
+            <!-- 카드1 -->
+            <div style="background:#fff;border-radius:18px;box-shadow:0 2px 12px rgba(123,110,234,0.10);padding:28px 22px 24px 22px;min-width:260px;flex:1;max-width:320px;display:flex;flex-direction:column;align-items:center;">
+              <img src="https://cdn-icons-png.flaticon.com/512/3135/3135768.png" alt="AI 수학 문제 생성" style="width:54px;height:54px;margin-bottom:14px;">
+              <div style="font-size:1.08rem;font-weight:700;color:#234;margin-bottom:8px;">AI 수학 문제 생성</div>
+              <div style="font-size:0.98rem;color:#555;text-align:center;margin-bottom:16px;">AI가 단원 주제에 맞는 수학 문제를 자동으로 만들어줍니다.</div>
+              <a href="#" class="expo-btn sub-btn" style="width:100%;text-align:center;">체험하기</a>
+            </div>
+            <!-- 카드2 -->
+            <div style="background:#fff;border-radius:18px;box-shadow:0 2px 12px rgba(123,110,234,0.10);padding:28px 22px 24px 22px;min-width:260px;flex:1;max-width:320px;display:flex;flex-direction:column;align-items:center;">
+              <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="AI 풀이 과정 분석" style="width:54px;height:54px;margin-bottom:14px;">
+              <div style="font-size:1.08rem;font-weight:700;color:#234;margin-bottom:8px;">AI 풀이 과정 분석</div>
+              <div style="font-size:0.98rem;color:#555;text-align:center;margin-bottom:16px;">AI가 학생의 풀이 과정을 실시간으로 분석해줍니다.</div>
+              <a href="#" class="expo-btn sub-btn" style="width:100%;text-align:center;">체험하기</a>
+            </div>
+            <!-- 카드3 -->
+            <div style="background:#fff;border-radius:18px;box-shadow:0 2px 12px rgba(123,110,234,0.10);padding:28px 22px 24px 22px;min-width:260px;flex:1;max-width:320px;display:flex;flex-direction:column;align-items:center;">
+              <img src="https://cdn-icons-png.flaticon.com/512/3135/3135789.png" alt="AI 수학 게임" style="width:54px;height:54px;margin-bottom:14px;">
+              <div style="font-size:1.08rem;font-weight:700;color:#234;margin-bottom:8px;">AI 수학 게임</div>
+              <div style="font-size:0.98rem;color:#555;text-align:center;margin-bottom:16px;">AI와 함께하는 수학 게임으로 재미있게 학습해보세요.</div>
+              <a href="#" class="expo-btn sub-btn" style="width:100%;text-align:center;">체험하기</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!-- 맨 위로 버튼 -->
+  <button id="scrollTopBtn" title="맨 위로">↑</button>
+  <button class="floating-apply-btn" onclick="location.href='teacher-training.html'">
+    맞춤 교원 연수 신청하세요!
+  </button>
+  <script>
+    // index.html과 동일한 플로팅 메뉴 show/hide & active 섹션 강조
+    const floatingMenu = document.getElementById('floatingMenu');
+    const englishDetail = document.getElementById('english-detail');
+    const showEnglishBtn = document.getElementById('show-english-detail');
+    let englishDetailOpened = false;
+    const sections = [
+      {id: 'english-prep', menu: 'menu-prep'},
+      {id: 'english-class', menu: 'menu-class'},
+      {id: 'english-guide', menu: 'menu-guide'}
+    ];
+    // 영어관 바로가기 클릭 시 상세 영역 보이기
+    if (showEnglishBtn) {
+      showEnglishBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        englishDetail.style.display = 'block';
+        englishDetailOpened = true;
+        onScrollFloatingMenu(); // 바로 체크
+        // 수업 준비로 부드럽게 이동
+        const prep = document.getElementById('english-prep');
+        if (prep) window.scrollTo({top: prep.offsetTop - 80, behavior: 'smooth'});
+      });
+    }
+    function onScrollFloatingMenu() {
+      // 상세 영역이 열리지 않았으면 무조건 숨김
+      if (!englishDetailOpened) {
+        floatingMenu.classList.add('hide');
+        return;
+      }
+      const scrollY = window.scrollY || window.pageYOffset;
+      const prepTop = document.getElementById('english-prep').getBoundingClientRect().top + window.scrollY;
+      if (scrollY + 80 >= prepTop) {
+        floatingMenu.classList.remove('hide');
+      } else {
+        floatingMenu.classList.add('hide');
+      }
+      // active 메뉴 강조
+      let currentIdx = 0;
+      for (let i = 0; i < sections.length; i++) {
+        const sec = document.getElementById(sections[i].id);
+        // 마지막 섹션은 화면 하단까지 도달 시 active
+        if (i === sections.length - 1) {
+          const secRect = sec.getBoundingClientRect();
+          const winH = window.innerHeight || document.documentElement.clientHeight;
+          if (secRect.top - 120 <= 0 && secRect.bottom - 120 > 0) {
+            currentIdx = i;
+          } else if (secRect.top - 120 <= 0 && secRect.bottom - 120 <= 0) {
+            currentIdx = i;
+          }
+        } else {
+          if (sec.getBoundingClientRect().top - 120 <= 0) {
+            currentIdx = i;
+          }
+        }
+      }
+      sections.forEach((s, idx) => {
+        const menu = document.getElementById(s.menu);
+        if (idx === currentIdx) menu.classList.add('active');
+        else menu.classList.remove('active');
+      });
+    }
+    window.addEventListener('scroll', onScrollFloatingMenu);
+    window.addEventListener('DOMContentLoaded', function() {
+      englishDetailOpened = englishDetail && englishDetail.style.display !== 'none';
+      onScrollFloatingMenu();
+    });
+    // 부드러운 스크롤 이동
+    document.querySelectorAll('.timeline-menu a').forEach(function(link){
+      link.addEventListener('click', function(e){
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if(target){
+          window.scrollTo({top: target.offsetTop - 80, behavior: 'smooth'});
+        }
+      });
+    });
+    // 플로팅 메뉴 상단 문구 동적 변경
+    const floatingLabel = document.getElementById('floatingLabel');
+    // 영어관 바로가기 클릭 시
+    if (showEnglishBtn) {
+      showEnglishBtn.addEventListener('click', function() {
+        floatingLabel.textContent = '영어관';
+      });
+    }
+    // 수학관 바로가기 클릭 시 상세 열기/플로팅 메뉴 변경
+    const showMathBtn = document.getElementById('show-math-detail');
+    const mathDetail = document.getElementById('math-detail');
+    if (showMathBtn) {
+      showMathBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        // 영어관 상세 숨기고 수학관 상세만 보이기
+        if (englishDetail) englishDetail.style.display = 'none';
+        if (mathDetail) mathDetail.style.display = 'block';
+        englishDetailOpened = false;
+        mathDetailOpened = true;
+        // 플로팅 메뉴 문구/메뉴 변경
+        floatingLabel.textContent = '수학관';
+        document.getElementById('menu-prep').textContent = '수업 준비';
+        document.getElementById('menu-class').textContent = '수업 시간';
+        document.getElementById('menu-guide').textContent = '맞춤 학습 지도';
+        document.getElementById('menu-experience').textContent = 'AIDT 수학관 체험';
+        // 부드럽게 수학관 상세로 이동
+        const prep = document.getElementById('math-prep');
+        if (prep) window.scrollTo({top: prep.offsetTop - 80, behavior: 'smooth'});
+        onScrollFloatingMenu();
+      });
+    }
+    // 영어관 바로가기 클릭 시에는 반대로 동작
+    if (showEnglishBtn) {
+      showEnglishBtn.addEventListener('click', function() {
+        if (mathDetail) mathDetail.style.display = 'none';
+        if (englishDetail) englishDetail.style.display = 'block';
+        englishDetailOpened = true;
+        mathDetailOpened = false;
+        floatingLabel.textContent = '영어관';
+        document.getElementById('menu-prep').textContent = '수업 준비';
+        document.getElementById('menu-class').textContent = '수업 시간';
+        document.getElementById('menu-guide').textContent = '맞춤 학습 지도';
+        document.getElementById('menu-experience').textContent = 'AIDT 영어관 체험';
+        onScrollFloatingMenu();
+      });
+    }
+    // 플로팅 메뉴 스크롤 동작도 영어/수학관에 따라 분기
+    let mathDetailOpened = false;
+    function onScrollFloatingMenu() {
+      // 상세 영역이 열리지 않았으면 무조건 숨김
+      if (!englishDetailOpened && !mathDetailOpened) {
+        floatingMenu.classList.add('hide');
+        return;
+      }
+      let prepTop = 0;
+      if (englishDetailOpened) {
+        prepTop = document.getElementById('english-prep').getBoundingClientRect().top + window.scrollY;
+      } else if (mathDetailOpened) {
+        prepTop = document.getElementById('math-prep').getBoundingClientRect().top + window.scrollY;
+      }
+      const scrollY = window.scrollY || window.pageYOffset;
+      if (scrollY + 80 >= prepTop) {
+        floatingMenu.classList.remove('hide');
+      } else {
+        floatingMenu.classList.add('hide');
+      }
+      // active 메뉴 강조
+      let currentIdx = 0;
+      let sectionsArr = [];
+      if (englishDetailOpened) {
+        sectionsArr = [
+          {id: 'english-prep', menu: 'menu-prep'},
+          {id: 'english-class', menu: 'menu-class'},
+          {id: 'english-guide', menu: 'menu-guide'},
+          {id: 'aidt-experience', menu: 'menu-experience'}
+        ];
+      } else if (mathDetailOpened) {
+        sectionsArr = [
+          {id: 'math-prep', menu: 'menu-prep'},
+          {id: 'math-class', menu: 'menu-class'},
+          {id: 'math-guide', menu: 'menu-guide'},
+          {id: 'aidt-math-experience', menu: 'menu-experience'}
+        ];
+      }
+      for (let i = 0; i < sectionsArr.length; i++) {
+        const sec = document.getElementById(sectionsArr[i].id);
+        if (i === sectionsArr.length - 1) {
+          const secRect = sec.getBoundingClientRect();
+          const winH = window.innerHeight || document.documentElement.clientHeight;
+          if (secRect.top - 120 <= 0 && secRect.bottom - 120 > 0) {
+            currentIdx = i;
+          } else if (secRect.top - 120 <= 0 && secRect.bottom - 120 <= 0) {
+            currentIdx = i;
+          }
+        } else {
+          if (sec.getBoundingClientRect().top - 120 <= 0) {
+            currentIdx = i;
+          }
+        }
+      }
+      sectionsArr.forEach((s, idx) => {
+        const menu = document.getElementById(s.menu);
+        if (idx === currentIdx) menu.classList.add('active');
+        else menu.classList.remove('active');
+      });
+    }
+    window.addEventListener('scroll', onScrollFloatingMenu);
+    window.addEventListener('DOMContentLoaded', function() {
+      englishDetailOpened = englishDetail && englishDetail.style.display !== 'none';
+      mathDetailOpened = mathDetail && mathDetail.style.display !== 'none';
+      onScrollFloatingMenu();
+    });
+    // 부드러운 스크롤 이동(플로팅 메뉴)
+    document.querySelectorAll('.timeline-menu a').forEach(function(link){
+      link.addEventListener('click', function(e){
+        e.preventDefault();
+        let target;
+        if (englishDetailOpened) {
+          if(this.getAttribute('href')==='#aidt-experience'){
+            target = document.getElementById('aidt-experience');
+          } else {
+            target = document.querySelector(this.getAttribute('href'));
+          }
+        } else if (mathDetailOpened) {
+          if(this.getAttribute('href')==='#aidt-experience'){
+            target = document.getElementById('aidt-math-experience');
+          } else {
+            const href = this.getAttribute('href').replace('english-', 'math-');
+            target = document.querySelector(href);
+          }
+        }
+        if(target){
+          window.scrollTo({top: target.offsetTop - 80, behavior: 'smooth'});
+        }
+      });
+    });
+    // 맨 위로 버튼 show/hide
+    const scrollTopBtn = document.getElementById('scrollTopBtn');
+    window.addEventListener('scroll', function() {
+      if (window.scrollY > window.innerHeight * 0.7) {
+        scrollTopBtn.style.display = 'block';
+      } else {
+        scrollTopBtn.style.display = 'none';
+      }
+    });
+    scrollTopBtn.addEventListener('click', function() {
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    });
+    
+    // AI 기능 체험 섹션 JavaScript
+    window.addEventListener('DOMContentLoaded', function() {
+      const featureButtons = document.querySelectorAll('.feature-btn');
+      const featureDescription = document.getElementById('feature-description');
+      
+      // 기능별 설명 내용
+      const featureContents = {
+        'ai-assistant': {
+          title: 'AI 보조교사 지원',
+          icon: '🤖',
+          description: '원하는 학습 자료가 있으면 아이쌤에게 바로 말해요.',
+          details: [
+            '영어 학습 문장을 바로 만들어 드려요. 수업에 활용할 수 있는 영어 문장은 AI 보조교사 아이쌤이 바로 만들어드려요. 원하는 카테고리와 사진을 골라주세요. AI가 알아서 사진 2장을 더 추가해 총 3가지 문장을 제공해요.',
+            '영상에 맞는 대화문을 다양하게 받아 봐요. 교과서에 탑재된 동영상으로 영어 대화문을 생성하는 기능이에요. 원하는 차시에 탑재된 영상을 고르면 끝. AI가 영상을 학습하고 그에 맞는 또 다른 대화문을 제공해요.',
+            '특별한 영어 사전을 활용해 보세요. 한글 혹은 영어로 단어를 검색하면 발음, 발음 영상, 필기 영상을 함께 제공해요. 발음의 경우 미국, 영국, 호주 3가지의 억양으로 들어 볼 수 있답니다.'
+          ]
+        },
+        'content': {
+          title: '교육용 콘텐츠 제공',
+          icon: '📚',
+          description: '재밌고 풍부한 자료를 쏙쏙 골라서 활용해요.',
+          details: [
+            '수 천장의 교육용 이미지가 있어요. 수업 자료실에서 원하는 키워드로 자료를 검색해 보세요. 수업에 활용하기 좋은 다양한 이미지가 바로 제공돼요. 아이스크림미디어가 보유한 수 천장의 교육용 콘텐츠로 풍부한 수업자료를 만들어 보세요.',
+            '화이트 보드로 학생들과 함께 자료를 만들어요. 선생님이 먼저 구성한 화이트 보드에 학생들이 그림을 그릴 수 있어요. 표현 도구를 활용해 펜의 색상과 굵기를 조절하고 수업 자료에 결과물을 따로 저장해 보세요. 선생님이 보유한 템플릿을 추가할 수도 있어요.',
+            'AI의 수업 보탬 자료는 어때요? 반 평균 학업 성취도에 따라 AI가 수업 보탬 자료를 추천해 드려요. 어휘 카드, 수업 놀이 자료, 듣기 자료 등 850여 종의 콘텐츠가 준비되어 있어요. 이 중 원하시는 자료를 자유롭게 활용하면 돼요.'
+          ]
+        },
+        'analysis': {
+          title: '학습 성취도 분석',
+          icon: '📊',
+          description: '빠른 학생, 느린 학생 모두 챙길 수 있어요.',
+          details: [
+            '매일 학습 이력을 분석해요. AI가 매일 학생들의 학습을 분석하고 한눈에 파악할 수 있도록 해줘요. 수업한 날짜와 단원 및 차시를 선택하면 학생들의 학업성취율을 5개 그룹으로 나누어 표시해요. 각 그룹의 학생 목록, 자세한 학습 이력을 관찰할 수 있어요.',
+            'AI가 수준별 맞춤 과제를 제공해요. 학생들의 학업 성취율에 맞는 과제도 AI가 알아서 만들어 줘요. 일자별 AI 추천 자료는 그룹별로 5개씩 일괄 제공돼요. 단원 평가는 학생별로 제공하거나 그룹 별로 10문제 혹은 20문제를 한번에 출제할 수 있어요.',
+            '누가 우리 반 성실 왕일까? 학생들이 AI Curi Talk, Touch Voca 등의 기능으로 스스로 학습을 하며 얼마나 열심히 공부를 했는지 알아볼 수 있어요. 문제를 많이 푼 학생, 많이 맞힌 학생, 꾸준히 연습한 학생 등 다양한 영역으로 파악해 보세요.'
+          ]
+        },
+        'monitoring': {
+          title: '실시간 학습 점검',
+          icon: '👀',
+          description: '수업의 처음부터 끝까지 학생들의 학습을 점검해요.',
+          details: [
+            '수업 중 AI 발음 분석 점수를 받아요. 학생들이 녹음 기능으로 영어 대본을 읽고 녹음하면 AI가 발음을 분석해요. 결과에 따라 학생 개별로 발음 실력을 분석해 선생님에게 결과를 제공해요.',
+            '수업 종료까지 집중을 이끌어요. 한 차시의 수업을 종료하기 전 5분 동안 단어를 맞추는 활동을 해요. 매일 8개의 단어를 맞추며 적당한 긴장감 속에서 복습을 하게 해줘요. 어려워하는 학생에게는 조명과 음성 힌트로 도움을 줄 수 있어요.',
+            '매시간 이루어지는 분석. AI는 매시간 학습이력을 저장하고 분석해요. 도전! 5분 단어를 끝으로 한 차시의 수업이 끝나면 깜빡이는 \'이력 전송\' 버튼을 클릭하면 자동으로 학습 이력이 전송돼요.'
+          ]
+        },
+        'care': {
+          title: '학생 정서 케어',
+          icon: '💝',
+          description: '때로는 속삭이듯, 때로는 마음을 읽듯 학생들과 진심을 나눠요.',
+          details: [
+            '학생의 마음까지 먼저 알고 케어해요. 학생들이 매일 자신의 심리 상태를 감정 날씨로 체크해요. 맑음, 흐린 뒤 갬 등 다양한 감정 날씨 표현이 있어요. 날씨라는 우회적 표현을 사용하여 학생들과 편안한 분위기로 상담을 진행할 수 있어요.',
+            '어떤 기분으로 이번 단원을 공부했을까? 단원의 학습이 끝나면 학생들에게 설문 문항이 주어져요. 해당 결과를 바탕으로 학생들이 학습을 하며 느낀 정서를 알 수 있어요. 자신감, 즐거움부터 불안함 등 세부적인 감정들로 이해도를 체크해요.',
+            '독려가 필요한 학생에게 메시지를 보내요. AI가 출제한 과제를 풀지 않은 학생들에게 메시지를 보낼 수 있어요. 상황에 따라 알맞은 문장을 선택해 독려가 필요한 학생에게 전달하세요. 학생은 친근한 편지 봉투 이미지로 메시지를 받게 돼요.'
+          ]
+        }
+      };
+      
+      // 기능 버튼 클릭 이벤트
+      featureButtons.forEach(button => {
+        button.addEventListener('click', function(event) {
+          event.preventDefault();
+          const feature = this.getAttribute('data-feature');
+          const content = featureContents[feature];
+          
+          // 모든 버튼 비활성화
+          featureButtons.forEach(btn => {
+            btn.style.background = '#e9ecef';
+            btn.style.color = '#666';
+            btn.style.boxShadow = 'none';
+            btn.classList.remove('active');
+          });
+          
+          // 클릭된 버튼 활성화
+          this.style.background = '#7b6eea';
+          this.style.color = 'white';
+          this.style.boxShadow = '0 2px 8px rgba(123,110,234,0.2)';
+          this.classList.add('active');
+          
+          // 설명 영역 업데이트
+          featureDescription.innerHTML = `
+            <div style="text-align: left; width: 100%;">
+              <div style="display: flex; align-items: flex-start; margin-bottom: 25px;">
+                <div style="font-size: 3rem; margin-right: 20px; flex-shrink: 0;">${content.icon}</div>
+                <div style="flex: 1;">
+                  <h4 style="font-size: 1.5rem; color: #7b6eea; font-weight: 700; margin: 0 0 8px 0;">${content.title}</h4>
+                  <p style="font-size: 1.15rem; color: #666; margin: 0; line-height: 1.5;">${content.description}</p>
+                </div>
+              </div>
+              <div style="background: rgba(255,255,255,0.7); border-radius: 16px; padding: 25px; border-left: 4px solid #7b6eea;">
+                <ul style="padding-left: 0; margin: 0; list-style: none;">
+                  ${content.details.map((detail, index) => `
+                    <li style="margin-bottom: ${index === content.details.length - 1 ? '0' : '20px'}; padding-left: 25px; position: relative; color: #444; line-height: 1.7; font-size: 1.05rem;">
+                      <span style="position: absolute; left: 0; top: 0; color: #7b6eea; font-weight: bold; font-size: 1.2rem;">•</span>
+                      ${detail}
+                    </li>
+                  `).join('')}
+                </ul>
+              </div>
+            </div>
+          `;
+        });
+      });
+      
+      // 페이지 로드 시 첫 번째 기능 자동 선택
+      const firstButton = document.querySelector('.feature-btn[data-feature="ai-assistant"]');
+      if (firstButton) {
+        firstButton.click();
+      }
+      
+      // URL 파라미터 확인하여 해당 탭 자동 활성화
+      const urlParams = new URLSearchParams(window.location.search);
+      const tabParam = urlParams.get('tab');
+      
+      if (tabParam === 'english') {
+        // 영어관 탭 자동 활성화
+        const englishButton = document.getElementById('show-english-detail');
+        if (englishButton) {
+          englishButton.click();
+        }
+      } else if (tabParam === 'math') {
+        // 수학관 탭 자동 활성화
+        const mathButton = document.getElementById('show-math-detail');
+        if (mathButton) {
+          mathButton.click();
+        }
+      }
+    });
+  </script>
+
+  <!-- 푸터 -->
+  <footer style="background: #e9ecef; padding: 40px 0 20px 0; margin-top: 60px; border-top: 1px solid #dee2e6;">
+    <div style="max-width: 1400px; margin: 0 auto; padding: 0 20px;">
+      <!-- 회사 정보 -->
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 300px;">
+          <div style="margin-bottom: 20px;">
+            <img src="https://aidt.i-scream.co.kr/assets/images/common/logo_footer.png" alt="아이스크림미디어" style="height: 40px; margin-bottom: 15px;">
+          </div>
+          <div style="color: #6c757d; font-size: 0.9rem; line-height: 1.6;">
+            <p style="margin: 0 0 8px 0;">경기도 성남시 분당구 판교역로 225-20 아이스크림미디어</p>
+            <p style="margin: 0;">ⓒi-Scream Media Corporation. All rights reserved.</p>
+          </div>
+        </div>
+        
+        <!-- 링크 섹션 -->
+        <div style="display: flex; gap: 40px; flex-wrap: wrap;">
+          <div>
+            <h4 style="margin: 0 0 15px 0; font-size: 1rem; color: #495057; font-weight: 600;">회사 정보</h4>
+            <ul style="list-style: none; padding: 0; margin: 0;">
+              <li style="margin-bottom: 8px;">
+                <a href="https://www.i-scream.co.kr" style="color: #6c757d; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;">회사 소개</a>
+              </li>
+            </ul>
+          </div>
+          
+          <div>
+            <h4 style="margin: 0 0 15px 0; font-size: 1rem; color: #495057; font-weight: 600;">관계사 사이트</h4>
+            <ul style="list-style: none; padding: 0; margin: 0;">
+              <li style="margin-bottom: 8px;">
+                <a href="https://www.i-scream.co.kr" style="color: #6c757d; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;">아이스크림미디어</a>
+              </li>
+              <li style="margin-bottom: 8px;">
+                <a href="https://www.dongapub.co.kr" style="color: #6c757d; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;">동아출판</a>
+              </li>
+              <li style="margin-bottom: 8px;">
+                <a href="https://aidt.i-scream.co.kr" style="color: #6c757d; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;">AIDT</a>
+              </li>
+              <li style="margin-bottom: 8px;">
+                <a href="https://www.i-scream.co.kr/training" style="color: #6c757d; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;">연수원</a>
+              </li>
+              <li style="margin-bottom: 8px;">
+                <a href="https://www.semtube.co.kr" style="color: #6c757d; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;">쌤튜브</a>
+              </li>
+              <li style="margin-bottom: 8px;">
+                <a href="https://www.i-scream.co.kr/mall" style="color: #6c757d; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;">아이스크림몰</a>
+              </li>
+              <li style="margin-bottom: 8px;">
+                <a href="https://www.highclass.co.kr" style="color: #6c757d; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;">하이클래스</a>
+              </li>
+              <li style="margin-bottom: 8px;">
+                <a href="https://www.thinkbell.co.kr" style="color: #6c757d; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;">띵커벨</a>
+              </li>
+              <li style="margin-bottom: 8px;">
+                <a href="https://www.classtool.co.kr" style="color: #6c757d; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;">클래스툴</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <style>
+    footer a:hover {
+      color: #1a73e8 !important;
+    }
+    
+    @media (max-width: 768px) {
+      footer {
+        padding: 30px 0 15px 0;
+      }
+      
+      footer > div > div {
+        flex-direction: column;
+        gap: 30px;
+      }
+      
+      footer > div > div > div:first-child {
+        min-width: auto;
+      }
+      
+      footer > div > div > div:last-child {
+        gap: 30px;
+      }
+    }
+  </style>
+</body>
+</html> 

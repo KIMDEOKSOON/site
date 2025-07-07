@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 기술 | 아이스크림 AIDT</title>
+  <style>
+    body { margin: 0; font-family: 'Noto Sans KR', sans-serif; background: #f8f9fa; }
+    .gnb {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 64px;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .gnb-left {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #1e90ff;
+      cursor: pointer;
+      text-decoration: none;
+      flex: 0 0 auto;
+      margin-right: 48px;
+    }
+    .gnb-center {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      position: static;
+    }
+    .gnb-center a {
+      color: #222;
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .gnb-center a:hover {
+      color: #1e90ff;
+    }
+    .gnb-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      left: 0;
+      top: 100%;
+      min-width: 120px;
+      background: #fff;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      border-radius: 10px;
+      z-index: 200;
+      padding: 8px 0;
+      margin-top: 0;
+    }
+    .dropdown-content a {
+      display: block;
+      padding: 10px 20px;
+      color: #222;
+      text-decoration: none;
+      font-size: 1rem;
+      transition: background 0.18s, color 0.18s;
+      border-radius: 6px;
+    }
+    .dropdown-content a:hover {
+      background: #f0f4ff;
+      color: #1e90ff;
+    }
+    .gnb-dropdown:hover .dropdown-content,
+    .gnb-dropdown:focus-within .dropdown-content {
+      display: block;
+    }
+    @media (max-width:900px) {
+      .gnb {
+        flex-direction: column;
+        height: auto;
+        padding: 0 10px;
+      }
+      .gnb-center {
+        position: static;
+        left: unset;
+        top: unset;
+        transform: none;
+        gap: 16px;
+      }
+      .dropdown-content {
+        left: 0;
+        min-width: 100px;
+      }
+    }
+    .rolling-section {
+      background: #eaf4ff;
+      padding: 0 0 20px 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .rolling-title {
+      font-size:2.1rem; color:#fff; background:#7b6eea; padding:40px 0 20px 0; border-radius:0 0 32px 32px; font-weight:bold;
+    }
+    .rolling-list {
+      display: flex;
+      align-items: center;
+      animation: rolling 40s linear infinite;
+      gap: 15px;
+      width: max-content;
+      margin: 40px 0 0 0;
+      padding: 0 25px;
+    }
+    .rolling-list:hover {
+      animation-play-state: paused;
+    }
+    .rolling-item {
+      background: rgba(255,255,255,0.95);
+      border-radius: 32px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      min-width: 240px;
+      min-height: 320px;
+      width: 240px;
+      height: 320px;
+      max-width: 240px;
+      max-height: 320px;
+      font-size: 1.1rem;
+      color: #222;
+      margin: 0 5px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(123,110,234,0.1);
+    }
+    .rolling-item img {
+      width: 72px;
+      height: 72px;
+      margin-top: 28px;
+      margin-bottom: 20px;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 12px rgba(123,110,234,0.15));
+      transition: transform 0.3s ease;
+    }
+    .rolling-item b {
+      font-size: 1.25rem;
+      margin-bottom: 16px;
+      color: #7b6eea;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.4;
+      padding: 0 16px;
+    }
+    .rolling-item .desc {
+      font-size: 1.05rem;
+      color: #555;
+      text-align: center;
+      padding: 0 20px;
+      line-height: 1.6;
+    }
+    .rolling-item .glass-hover {
+      display: none;
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(255,255,255,0.25);
+      backdrop-filter: blur(8px);
+      border-radius: 24px;
+      z-index: 2;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      transition: 0.2s;
+    }
+    .rolling-item:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 16px 48px rgba(123,110,234,0.25);
+      background: rgba(255,255,255,0.98);
+      border-color: rgba(123,110,234,0.3);
+    }
+    .rolling-item:hover img {
+      transform: scale(1.1);
+    }
+    .rolling-item:hover .glass-hover {
+      display: flex;
+    }
+    .glass-btn {
+      background: linear-gradient(135deg, #7b6eea 0%, #1ec9a8 100%);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      padding: 14px 28px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      box-shadow: 0 4px 16px rgba(123,110,234,0.3);
+      cursor: pointer;
+      margin-top: 16px;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .glass-btn:hover {
+      background: linear-gradient(135deg, #1ec9a8 0%, #7b6eea 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(123,110,234,0.4);
+    }
+    @keyframes rolling {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(calc(-50% - 25px)); }
+    }
+    @media (max-width: 900px) {
+      .gnb { flex-direction: column; height: auto; padding: 0 10px; }
+      .gnb-center {
+        position: static;
+        left: unset;
+        top: unset;
+        transform: none;
+        gap: 16px;
+      }
+      .rolling-list {
+        gap: 10px;
+        padding: 0 15px;
+      }
+      .rolling-item {
+        min-width: 180px; min-height: 240px; width: 180px; height: 240px; max-width: 180px; max-height: 240px;
+        font-size: 1rem;
+        border-radius: 24px;
+      }
+      .rolling-item img { 
+        width: 56px; 
+        height: 56px; 
+        margin-top: 24px; 
+        margin-bottom: 16px; 
+      }
+      .rolling-item b {
+        font-size: 1.1rem;
+        margin-bottom: 12px;
+        padding: 0 12px;
+      }
+      .rolling-item .desc {
+        font-size: 0.95rem;
+        padding: 0 16px;
+      }
+    }
+    .gnb-dropdown:hover .dropdown-content,
+    .gnb-dropdown:focus-within .dropdown-content {
+      display: block;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      left: 0;
+      top: 100%;
+      min-width: 120px;
+      background: #fff;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      border-radius: 10px;
+      z-index: 200;
+      padding: 8px 0;
+      margin-top: 4px;
+    }
+    .ai-tab-panel {
+      background: #f4f8ff;
+      border-radius: 18px;
+      box-shadow: 0 2px 12px rgba(45,58,140,0.08);
+      padding: 38px 28px 30px 28px;
+      margin-bottom: 18px;
+      margin-top: 0;
+      border: 1.5px solid #eaf4ff;
+      position: relative;
+      min-height: 340px;
+      transition: box-shadow 0.18s, min-height 0.18s;
+    }
+    .ai-tab-panel h3 {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 1.22rem;
+      font-weight: bold;
+      color: #2d3a8c;
+      margin-bottom: 12px;
+      margin-top: 0;
+    }
+    .ai-tab-panel .ai-panel-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: #eaf4ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 4px rgba(45,58,140,0.08);
+      margin-right: 2px;
+    }
+    .ai-tab {
+      background: #eaf4ff;
+      border: none;
+      border-radius: 14px 14px 0 0;
+      font-size: 1.08rem;
+      font-weight: 600;
+      color: #2d3a8c;
+      padding: 18px 32px 14px 32px;
+      margin: 0 2px;
+      cursor: pointer;
+      outline: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 110px;
+      box-shadow: 0 2px 8px rgba(123,110,234,0.08);
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+    }
+    .ai-tab img {
+      height: 44px;
+      margin-bottom: 10px;
+      transition: filter 0.2s;
+      filter: none;
+    }
+    .ai-tab.active {
+      background: #fff;
+      color: #7b6eea;
+      font-weight: 700;
+      border-bottom: 3px solid #7b6eea;
+      box-shadow: 0 4px 16px rgba(123,110,234,0.15);
+      z-index: 2;
+    }
+    .ai-tab.active img {
+      /* 보라색 계열로 아이콘 강조 */
+      filter: invert(38%) sepia(77%) saturate(749%) hue-rotate(217deg) brightness(98%) contrast(101%);
+    }
+    .ai-tab:not(.active):hover {
+      background: #f0f4ff;
+      color: #1ec9a8;
+    }
+    .ai-tab:not(.active):hover img {
+      filter: none;
+    }
+    @media (max-width: 700px) {
+      .ai-tab {
+        padding: 12px 10px 8px 10px;
+        font-size: 0.98rem;
+      }
+    }
+    .floating-apply-btn {
+      position: fixed;
+      right: 32px;
+      bottom: 32px;
+      z-index: 500;
+      background: linear-gradient(90deg,#7b6eea 0%,#1ec9a8 100%);
+      color: #fff;
+      font-size: 1.13rem;
+      font-weight: 700;
+      padding: 20px 38px;
+      border-radius: 32px;
+      box-shadow: 0 4px 24px rgba(123,110,234,0.18);
+      border: none;
+      cursor: pointer;
+      transition: background 0.18s, box-shadow 0.18s, transform 0.18s;
+      outline: none;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .floating-apply-btn:hover {
+      background: linear-gradient(90deg,#1ec9a8 0%,#7b6eea 100%);
+      box-shadow: 0 8px 32px rgba(30,201,255,0.18);
+      transform: translateY(-2px) scale(1.04);
+    }
+    @media (max-width: 700px) {
+      .floating-apply-btn { right: 12px; bottom: 12px; padding: 14px 18px; font-size: 1rem; }
+    }
+    
+    /* 과목별 체험 섹션 호버 효과 */
+    .subject-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 16px 48px rgba(123,110,234,0.2);
+    }
+    
+    .subject-card:hover .experience-btn {
+      transform: scale(1.05);
+    }
+    
+    @media (max-width: 768px) {
+      .subject-card {
+        min-width: 240px !important;
+        max-width: 280px !important;
+        padding: 30px 24px !important;
+      }
+    }
+   </style>
+</head>
+<body>
+  <nav class="gnb">
+    <a class="gnb-left" href="index.html">아이스크림 AIDT</a>
+    <div class="gnb-center">
+      <a href="ai-tech.html" style="color:#7b6eea;font-weight:700;">AI 기술</a>
+      <div class="gnb-dropdown">
+        <a href="web-expo.html" class="dropdown-toggle" tabindex="-1">웹전시관</a>
+      </div>
+      <a href="contact.html">문의하기</a>
+      <a href="teacher-training.html">교원 연수</a>
+    </div>
+  </nav>
+  <section class="rolling-section" id="ai-tech">
+    <div class="rolling-title" style="font-size:2.1rem; color:#fff; background:#7b6eea; padding:40px 0 20px 0; border-radius:0 0 32px 32px; font-weight:bold;">
+      교과서의 새로운 내일,<br><span style="color:#ffe14f;">아이스크림 AIDT</span>
+      <div style="font-size:1.15rem; color:#fff; font-weight:400; margin-top:18px;">좋은 수업이 떠올랐다!<br>재미있고 유익한 수업 설계를 쉽고 간편하게!</div>
+    </div>
+    <div style="overflow:hidden; width:100vw;">
+      <div style="font-size:2.2rem; font-weight:bold; color:#7b6eea; margin:36px 0 18px 0; letter-spacing:-1px;">교과서에 숨은 AI 기술 찾기</div>
+      <div class="rolling-list" id="rolling-list">
+        <!-- 첫 번째 세트 -->
+        <div class="rolling-item">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="학생 주도형 학습 아이콘">
+          <b>학생 주도형 학습 강화</b>
+          <div class="desc">조작 활동, 놀이, 프로젝트 중심의 수업 구성과 이야기 중심 단원 도입으로 흥미 유발</div>
+          <div class="glass-hover">
+            <a href="#" class="glass-btn" data-detail-id="ai1">보러가기</a>
+          </div>
+        </div>
+        <div class="rolling-item">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135716.png" alt="수준별 학습 아이콘">
+          <b>학습자의 수준과 발달을 고려한 구성</b>
+          <div class="desc">성취 기준에 맞춘 학습량 조절 및 난이도 차등화, 자기주도 학습을 위한 평가 및 피드백</div>
+          <div class="glass-hover">
+            <a href="#" class="glass-btn" data-detail-id="ai2">보러가기</a>
+          </div>
+        </div>
+        <div class="rolling-item">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135717.png" alt="다양한 표현 아이콘">
+          <b>다양한 표현 수단과 상호작용 설계</b>
+          <div class="desc">자막, 대본, 영상 속 텍스트 등 시청각 정보 다중 제공과 인터랙티브 문항 구성</div>
+          <div class="glass-hover">
+            <a href="#" class="glass-btn" data-detail-id="ai3">보러가기</a>
+          </div>
+        </div>
+        <div class="rolling-item">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135718.png" alt="실생활 연계 아이콘">
+          <b>실생활 연계와 창의적 사고 유도</b>
+          <div class="desc">실생활 문제 해결 중심 프로젝트형 수업과 개념 응용을 위한 놀이 기반 활동</div>
+          <div class="glass-hover">
+            <a href="#" class="glass-btn" data-detail-id="ai4">보러가기</a>
+          </div>
+        </div>
+        <div class="rolling-item">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135719.png" alt="전용 기능 아이콘">
+          <b>교사와 학생을 위한 전용 기능 제공</b>
+          <div class="desc">교사용 수업 재구성 도구 및 과제 자동 출제 시스템, AI 추천 자료 기반 수업 설계</div>
+          <div class="glass-hover">
+            <a href="#" class="glass-btn" data-detail-id="ai5">보러가기</a>
+          </div>
+        </div>
+        <div class="rolling-item">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135720.png" alt="다차원 상호작용 아이콘">
+          <b>다차원 상호작용 지원</b>
+          <div class="desc">학생-콘텐츠, 학생-AI 튜터, 학생-학생 간 상호작용 도구와 모둠 도구, 협업 기능 제공</div>
+          <div class="glass-hover">
+            <a href="#" class="glass-btn" data-detail-id="ai6">보러가기</a>
+          </div>
+        </div>
+        <div class="rolling-item">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135721.png" alt="AI 추천 아이콘">
+          <b>AI 추천 시스템</b>
+          <div class="desc">학습 이력과 문항 유사성 기반 맞춤형 문항 추천, 협업 필터링으로 학습 패턴 분석</div>
+          <div class="glass-hover">
+            <a href="#" class="glass-btn" data-detail-id="ai7">보러가기</a>
+          </div>
+        </div>
+        <div class="rolling-item">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135722.png" alt="지식맵 아이콘">
+          <b>지식맵 기반 맞춤형 학습 경로 제공</b>
+          <div class="desc">성취 기준 중심 지식맵 구성, 각 개념의 이해도를 분석하여 개별 학습 경로 추천</div>
+          <div class="glass-hover">
+            <a href="#" class="glass-btn" data-detail-id="ai8">보러가기</a>
+          </div>
+        </div>
+        <div class="rolling-item">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135723.png" alt="AI 보조교사 아이콘">
+          <b>AI 보조교사 기능</b>
+          <div class="desc">교사에게 학생별 학습 현황, 추천 과제, 평어 제공, 수업 전·중·후 진단 및 피드백 관리</div>
+          <div class="glass-hover">
+            <a href="#" class="glass-btn" data-detail-id="ai9">보러가기</a>
+          </div>
+        </div>
+        <div class="rolling-item">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135724.png" alt="AI 튜터 아이콘">
+          <b>AI 튜터 기능</b>
+          <div class="desc">학생의 학습 성과 분석 후 부족한 개념 중심 보충 콘텐츠 제공, 음성 인식 및 챗봇형 대응</div>
+          <div class="glass-hover">
+            <a href="#" class="glass-btn" data-detail-id="ai10">보러가기</a>
+          </div>
+        </div>
+        <div class="rolling-item">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135725.png" alt="학습 분석 아이콘">
+          <b>학습 분석 대시보드</b>
+          <div class="desc">학생/학급 단위 성취도, 진도, 강약점 분석, 시각화된 리포트로 학습 현황 인지</div>
+          <div class="glass-hover">
+            <a href="#" class="glass-btn" data-detail-id="ai11">보러가기</a>
+          </div>
+        </div>
+        
+        <!-- 두 번째 세트 (무한 롤링을 위한 복제) -->
+        <div class="rolling-item">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="학생 주도형 학습 아이콘">
+          <b>학생 주도형 학습 강화</b>
+          <div class="desc">조작 활동, 놀이, 프로젝트 중심의 수업 구성과 이야기 중심 단원 도입으로 흥미 유발</div>
+          <div class="glass-hover">
+            <a href="#" class="glass-btn" data-detail-id="ai1">보러가기</a>
+          </div>
+        </div>
+        <div class="rolling-item">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135716.png" alt="수준별 학습 아이콘">
+          <b>학습자의 수준과 발달을 고려한 구성</b>
+          <div class="desc">성취 기준에 맞춘 학습량 조절 및 난이도 차등화, 자기주도 학습을 위한 평가 및 피드백</div>
+          <div class="glass-hover">
+            <a href="#" class="glass-btn" data-detail-id="ai2">보러가기</a>
+          </div>
+        </div>
+        <div class="rolling-item">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135717.png" alt="다양한 표현 아이콘">
+          <b>다양한 표현 수단과 상호작용 설계</b>
+          <div class="desc">자막, 대본, 영상 속 텍스트 등 시청각 정보 다중 제공과 인터랙티브 문항 구성</div>
+          <div class="glass-hover">
+            <a href="#" class="glass-btn" data-detail-id="ai3">보러가기</a>
+          </div>
+        </div>
+        <div class="rolling-item">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135718.png" alt="실생활 연계 아이콘">
+          <b>실생활 연계와 창의적 사고 유도</b>
+          <div class="desc">실생활 문제 해결 중심 프로젝트형 수업과 개념 응용을 위한 놀이 기반 활동</div>
+          <div class="glass-hover">
+            <a href="#" class="glass-btn" data-detail-id="ai4">보러가기</a>
+          </div>
+        </div>
+        <div class="rolling-item">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135719.png" alt="전용 기능 아이콘">
+          <b>교사와 학생을 위한 전용 기능 제공</b>
+          <div class="desc">교사용 수업 재구성 도구 및 과제 자동 출제 시스템, AI 추천 자료 기반 수업 설계</div>
+          <div class="glass-hover">
+            <a href="#" class="glass-btn" data-detail-id="ai5">보러가기</a>
+          </div>
+        </div>
+        <div class="rolling-item">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135720.png" alt="다차원 상호작용 아이콘">
+          <b>다차원 상호작용 지원</b>
+          <div class="desc">학생-콘텐츠, 학생-AI 튜터, 학생-학생 간 상호작용 도구와 모둠 도구, 협업 기능 제공</div>
+          <div class="glass-hover">
+            <a href="#" class="glass-btn" data-detail-id="ai6">보러가기</a>
+          </div>
+        </div>
+        <div class="rolling-item">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135721.png" alt="AI 추천 아이콘">
+          <b>AI 추천 시스템</b>
+          <div class="desc">학습 이력과 문항 유사성 기반 맞춤형 문항 추천, 협업 필터링으로 학습 패턴 분석</div>
+          <div class="glass-hover">
+            <a href="#" class="glass-btn" data-detail-id="ai7">보러가기</a>
+          </div>
+        </div>
+        <div class="rolling-item">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135722.png" alt="지식맵 아이콘">
+          <b>지식맵 기반 맞춤형 학습 경로 제공</b>
+          <div class="desc">성취 기준 중심 지식맵 구성, 각 개념의 이해도를 분석하여 개별 학습 경로 추천</div>
+          <div class="glass-hover">
+            <a href="#" class="glass-btn" data-detail-id="ai8">보러가기</a>
+          </div>
+        </div>
+        <div class="rolling-item">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135723.png" alt="AI 보조교사 아이콘">
+          <b>AI 보조교사 기능</b>
+          <div class="desc">교사에게 학생별 학습 현황, 추천 과제, 평어 제공, 수업 전·중·후 진단 및 피드백 관리</div>
+          <div class="glass-hover">
+            <a href="#" class="glass-btn" data-detail-id="ai9">보러가기</a>
+          </div>
+        </div>
+        <div class="rolling-item">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135724.png" alt="AI 튜터 아이콘">
+          <b>AI 튜터 기능</b>
+          <div class="desc">학생의 학습 성과 분석 후 부족한 개념 중심 보충 콘텐츠 제공, 음성 인식 및 챗봇형 대응</div>
+          <div class="glass-hover">
+            <a href="#" class="glass-btn" data-detail-id="ai10">보러가기</a>
+          </div>
+        </div>
+        <div class="rolling-item">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135725.png" alt="학습 분석 아이콘">
+          <b>학습 분석 대시보드</b>
+          <div class="desc">학생/학급 단위 성취도, 진도, 강약점 분석, 시각화된 리포트로 학습 현황 인지</div>
+          <div class="glass-hover">
+            <a href="#" class="glass-btn" data-detail-id="ai11">보러가기</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI 아이콘 탭 섹션 -->
+  <section class="ai-icons-section" style="background:#fff; padding:0 0 60px 0;">
+    <div style="max-width:1400px; margin:0 auto; padding:0 20px;">
+      <h2 style="font-size:2.2rem; color:#2d3a8c; font-weight:bold; margin-bottom:32px; text-align:center;">아이스크림 AI 
+기술
+      </h2>
+      <div id="ai-tab-menu" style="display:flex; gap:38px; flex-wrap:wrap; justify-content:center; align-items:flex-end; margin-bottom:32px;">
+        <button class="ai-tab active" data-tab="llm" style="background:none; border:none; cursor:pointer; outline:none; display:flex; flex-direction:column; align-items:center; min-width:110px;">
+          <img src="https://www.i-screammedia.com/front/imgs/r&d/R&D_goal_image1.png" alt="대형언어모델" style="height:54px; margin-bottom:10px;">
+          <span style="font-size:1.08rem; color:#222; font-weight:500;">대형언어모델(LLM)</span>
+        </button>
+        <button class="ai-tab" data-tab="image" style="background:none; border:none; cursor:pointer; outline:none; display:flex; flex-direction:column; align-items:center; min-width:110px;">
+          <img src="https://www.i-screammedia.com/front/imgs/r&d/R&D_goal_image2.png" alt="이미지 생성" style="height:54px; margin-bottom:10px;">
+          <span style="font-size:1.08rem; color:#222; font-weight:500;">이미지 생성</span>
+        </button>
+        <button class="ai-tab" data-tab="sound" style="background:none; border:none; cursor:pointer; outline:none; display:flex; flex-direction:column; align-items:center; min-width:110px;">
+          <img src="https://www.i-screammedia.com/front/imgs/r&d/R&D_goal_image3.png" alt="사운드 생성" style="height:54px; margin-bottom:10px;">
+          <span style="font-size:1.08rem; color:#222; font-weight:500;">사운드 생성</span>
+        </button>
+        <button class="ai-tab" data-tab="vision" style="background:none; border:none; cursor:pointer; outline:none; display:flex; flex-direction:column; align-items:center; min-width:110px;">
+          <img src="https://www.i-screammedia.com/front/imgs/r&d/R&D_goal_image4.png" alt="이미지/동영상 인식" style="height:54px; margin-bottom:10px;">
+          <span style="font-size:1.08rem; color:#222; font-weight:500;">이미지(동영상) 인식</span>
+        </button>
+        <button class="ai-tab" data-tab="video" style="background:none; border:none; cursor:pointer; outline:none; display:flex; flex-direction:column; align-items:center; min-width:110px;">
+          <img src="https://www.i-screammedia.com/front/imgs/r&d/R&D_goal_image5.png" alt="동영상 생성" style="height:54px; margin-bottom:10px;">
+          <span style="font-size:1.08rem; color:#222; font-weight:500;">동영상 생성</span>
+        </button>
+      </div>
+      <div id="ai-tab-content" style="max-width:1000px; margin:0 auto;">
+        <!-- 대형언어모델(LLM) -->
+        <div class="ai-tab-panel" data-tab="llm" style="display:block;">
+          <h3><span class="ai-panel-icon"><img src="https://www.i-screammedia.com/front/imgs/r&d/R&D_goal_image1.png" alt="대형언어모델" style="width:28px; height:28px;"></span>대형언어모델(LLM)</h3>
+          <p style="color:#444; font-size:1.05rem; line-height:1.7; margin-bottom:18px;">아이스크림S, 클래스툴 등 다양한 서비스에 적용된 대형언어모델(LLM)은 자연어 처리 기반의 생성형 AI로, AI 평어 생성, 문제풀이 해설, 생활기록부 문장 합성 등 다양한 교육 현장에 활용되고 있습니다. 앞으로는 문서 기반 검색, 챗봇, 다국어 번역 등 전체 서비스로 확대 적용될 예정입니다.</p>
+          <ul style="color:#555; font-size:0.98rem; line-height:1.7; padding-left:18px;">
+            <li>AI 평어 생성, 문제풀이 해설, 생활기록부 문장 합성</li>
+            <li>문서 기반 검색, 챗봇, 다국어 번역 등 서비스 확대 예정</li>
+          </ul>
+        </div>
+        <!-- 이미지 생성 -->
+        <div class="ai-tab-panel" data-tab="image" style="display:none;">
+          <h3><span class="ai-panel-icon"><img src="https://www.i-screammedia.com/front/imgs/r&d/R&D_goal_image2.png" alt="이미지 생성" style="width:28px; height:28px;"></span>이미지 생성</h3>
+          <p style="color:#444; font-size:1.05rem; line-height:1.7; margin-bottom:18px;">AI 이미지 생성 기술은 에듀뱅크, AI 클립아트 등에서 활용되며, 수업용 콘텐츠, 교과서 개발, 컬러링북, 협동화, 이미지 편집 등 다양한 교육 콘텐츠 제작에 적용되고 있습니다.</p>
+          <ul style="color:#555; font-size:0.98rem; line-height:1.7; padding-left:18px;">
+            <li>AI 이미지 생성, AI 클립아트</li>
+            <li>수업용 콘텐츠, 교과서 개발, 이미지 편집 등</li>
+          </ul>
+        </div>
+        <!-- 사운드 생성 -->
+        <div class="ai-tab-panel" data-tab="sound" style="display:none;">
+          <h3><span class="ai-panel-icon"><img src="https://www.i-screammedia.com/front/imgs/r&d/R&D_goal_image3.png" alt="사운드 생성" style="width:28px; height:28px;"></span>사운드 생성</h3>
+          <p style="color:#444; font-size:1.05rem; line-height:1.7; margin-bottom:18px;">사운드 생성 AI는 아이스크림콜, 클래스툴 등에서 녹음(STT), 콘텐츠 더빙, 자동 자막 생성, 자동 회의록, 교사 목소리 변환, 영어 발음 교정 등 다양한 음성 기반 서비스에 적용되고 있습니다.</p>
+          <ul style="color:#555; font-size:0.98rem; line-height:1.7; padding-left:18px;">
+            <li>녹음(STT), 콘텐츠 더빙, 자동 자막/회의록 생성</li>
+            <li>교사 목소리 변환, 영어 발음 교정 등</li>
+          </ul>
+        </div>
+        <!-- 이미지(동영상) 인식 -->
+        <div class="ai-tab-panel" data-tab="vision" style="display:none;">
+          <h3><span class="ai-panel-icon"><img src="https://www.i-screammedia.com/front/imgs/r&d/R&D_goal_image4.png" alt="이미지/동영상 인식" style="width:28px; height:28px;"></span>이미지(동영상) 인식</h3>
+          <p style="color:#444; font-size:1.05rem; line-height:1.7; margin-bottom:18px;">이미지 및 동영상 인식 AI는 AI Box, 받아쓰기 인식, 예쁜 글씨 쓰기, 학습 집중도 분석(얼굴/눈동자 인식), 감정 분석, 이미지 설명글 등 다양한 교과 활동과 연계되어 활용됩니다.</p>
+          <ul style="color:#555; font-size:0.98rem; line-height:1.7; padding-left:18px;">
+            <li>AI Box, 받아쓰기 인식, 예쁜 글씨 쓰기</li>
+            <li>학습 집중도 분석, 감정 분석, 이미지 설명글 등</li>
+          </ul>
+        </div>
+        <!-- 동영상 생성 -->
+        <div class="ai-tab-panel" data-tab="video" style="display:none;">
+          <h3><span class="ai-panel-icon"><img src="https://www.i-screammedia.com/front/imgs/r&d/R&D_goal_image5.png" alt="동영상 생성" style="width:28px; height:28px;"></span>동영상 생성</h3>
+          <p style="color:#444; font-size:1.05rem; line-height:1.7; margin-bottom:18px;">동영상 생성 AI는 시나리오, 이미지, 음성, 동영상 생성 등 다양한 모델 연구가 진행 중이며, 교육 관련 5분 이내 애니메이션, 실사/3D 동영상 등 다양한 교육 콘텐츠 제작에 적용될 예정입니다.</p>
+          <ul style="color:#555; font-size:0.98rem; line-height:1.7; padding-left:18px;">
+            <li>시나리오, 이미지, 음성, 동영상 생성</li>
+            <li>교육용 애니메이션, 실사/3D 동영상 등</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 아이스크림 AI 플랫폼 및 서비스 적용 섹션 -->
+  <section class="ai-platform-section" style="background:#fff; padding:60px 0 60px 0;">
+    <div style="max-width:1400px; margin:0 auto; padding:0 20px;">
+      <h2 style="font-size:2.2rem; color:#2d3a8c; font-weight:bold; margin-bottom:32px; text-align:center;">아이스크림 AI 플랫폼 및 서비스 적용</h2>
+      <div style="color:#444; font-size:1.08rem; line-height:1.7; margin-bottom:32px;">
+        아이스크림미디어는 대한민국 최초로 디지털 교육의 도전을 시작했습니다. 그 핵심에 항상 연구소가 있었습니다.<br>
+        세계적으로 인정받고 있는 아이스크림 플랫폼, 160종이 넘는 다양한 교실수업 S/W, HTML5로 제작된 최초의 디지털 콘텐츠 등<br>
+        우리 연구소의 끝없는 도전은 어느 나라에서도 찾아볼 수 없는 아이스크림미디어의 최첨단 교실환경을 만들었고 이 노력과 도전은 중단이 없을 것입니다.<br><br>
+        이제 생성형 AI 시대를 맞아 그동안 우리가 개발한 수많은 서비스와 솔루션에 AI를 접목하고 있습니다.<br>
+        AI 디지털 교과서도 콘텐츠, 서비스, S/W에 AI 코스웨어가 융합되어 세계적인 AI 디지털 교과서가 될 것입니다.
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="ai-platform-table" style="width:100%; border-collapse:separate; border-spacing:0; background:#f8f9fa; border-radius:18px; box-shadow:0 2px 12px rgba(45,58,140,0.06);">
+          <thead>
+            <tr style="background:#eaf4ff; color:#2d3a8c; font-size:1.08rem;">
+              <th style="padding:18px 12px; font-weight:700; border-radius:18px 0 0 0;">AI 플랫폼</th>
+              <th style="padding:18px 12px; font-weight:700;">서비스 적용</th>
+              <th style="padding:18px 12px; font-weight:700; border-radius:0 18px 0 0;">서비스 적용 예정</th>
+            </tr>
+          </thead>
+          <tbody style="font-size:1.01rem; color:#333;">
+            <tr>
+              <td style="padding:18px 12px; text-align:left; vertical-align:top;">
+                <img src="https://www.i-screammedia.com/front/imgs/r&d/R&D_goal_image1.png" alt="대형언어모델" style="height:38px; vertical-align:middle; margin-right:10px;">
+                대형언어모델(LLM)
+              </td>
+              <td style="padding:18px 12px; vertical-align:top;">
+                아이스크림S • AI 평어 생성<br>클래스툴 • AI 문제풀이 평어 생성, AI 생활기록부 문장 합성
+              </td>
+              <td style="padding:18px 12px; vertical-align:top;">
+                전체 서비스(아이스크림S, AI 디지털교과서) • 문서 기반 검색, 챗봇 • 다국어 번역
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:18px 12px; text-align:left; vertical-align:top;">
+                <img src="https://www.i-screammedia.com/front/imgs/r&d/R&D_goal_image2.png" alt="이미지 생성" style="height:38px; vertical-align:middle; margin-right:10px;">
+                이미지 생성
+              </td>
+              <td style="padding:18px 12px; vertical-align:top;">
+                에듀뱅크 • AI 이미지 생성 • AI 클립아트
+              </td>
+              <td style="padding:18px 12px; vertical-align:top;">
+                수업용 콘텐츠 생성 • 교과서 개발 • 컬러링북, 협동화 • 수업용 이미지 콘텐츠 생성, 편집
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:18px 12px; text-align:left; vertical-align:top;">
+                <img src="https://www.i-screammedia.com/front/imgs/r&d/R&D_goal_image3.png" alt="사운드 생성" style="height:38px; vertical-align:middle; margin-right:10px;">
+                사운드 생성
+              </td>
+              <td style="padding:18px 12px; vertical-align:top;">
+                아이스크림콜 • 녹음 목록(STT) • 콘텐츠 더빙
+              </td>
+              <td style="padding:18px 12px; vertical-align:top;">
+                아이스크림S, 클래스툴 • 자동 자막 생성, 자동 회의록 생성 • 교사 목소리 변환 수업 활용 • 영어 발음 교정
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:18px 12px; text-align:left; vertical-align:top;">
+                <img src="https://www.i-screammedia.com/front/imgs/r&d/R&D_goal_image4.png" alt="이미지/동영상 인식" style="height:38px; vertical-align:middle; margin-right:10px;">
+                이미지(동영상) 인식
+              </td>
+              <td style="padding:18px 12px; vertical-align:top;">
+                AI Box • 받아쓰기 인식 • 예쁜 글씨 쓰기
+              </td>
+              <td style="padding:18px 12px; vertical-align:top;">
+                AI 디지털교과서 • 학습 집중도 분석(얼굴 인식, 눈동자 인식) • 교과 활동 연계(감정 분석, 이미지 설명 글)
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:18px 12px; text-align:left; vertical-align:top; border-radius:0 0 0 18px;">
+                <img src="https://www.i-screammedia.com/front/imgs/r&d/R&D_goal_image5.png" alt="동영상 생성" style="height:38px; vertical-align:middle; margin-right:10px;">
+                동영상 생성
+              </td>
+              <td style="padding:18px 12px; vertical-align:top;">
+                기본 모델 연구 개발 중 • 시나리오, 이미지 생성 • 음성, 동영상 생성
+              </td>
+              <td style="padding:18px 12px; vertical-align:top; border-radius:0 0 18px 0;">
+                콘텐츠 생성(아이스크림S, AI 디지털교과서) • 교육 관련 5분 이내 애니메이션 생성 • 실사, 3D 동영상 생성
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 과목별 체험 섹션 -->
+  <section style="background: linear-gradient(135deg, #7b6eea 0%, #1ec9a8 100%); padding: 60px 0;">
+    <div style="max-width: 1400px; margin: 0 auto; padding: 0 20px; text-align: center;">
+      <h2 style="font-size:2.2rem; color:#2d3a8c; font-weight:bold; margin-bottom:32px; text-align:center;">체험하기</h2>
+      <p style="font-size: 1.15rem; color: rgba(255,255,255,0.9); margin-bottom: 48px; line-height: 1.6;">
+        직접 조작해 보며 활동하는 AI 기반 학습과 개인 맞춤형 교육으로<br>
+        <strong style="color: #fff;">학생들의 눈높이에 맞춘 디지털교과서</strong>
+      </p>
+      
+      <div style="display: flex; justify-content: center; gap: 40px; flex-wrap: wrap;">
+        <!-- 영어관 -->
+        <div class="subject-card" style="background: rgba(255,255,255,0.9); border-radius: 24px; padding: 40px 32px; box-shadow: 0 8px 32px rgba(123,110,234,0.12); min-width: 280px; max-width: 320px; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onclick="goToEnglishExpo()">
+          <div style="font-size: 3.5rem; margin-bottom: 20px;">📚</div>
+          <h3 style="font-size: 1.4rem; color: #7b6eea; font-weight: bold; margin-bottom: 12px;">영어관 바로가기</h3>
+          <p style="color: #666; font-size: 1rem; line-height: 1.5; margin-bottom: 24px;">
+            단원별 30여종의 활동 콘텐츠와 AI 맞춤학습으로<br>
+            <strong>쉽고 재미있게 학습하는 교과서</strong>
+          </p>
+          <div class="experience-btn" style="background: linear-gradient(90deg, #7b6eea 0%, #1ec9a8 100%); color: white; padding: 12px 24px; border-radius: 16px; font-weight: bold; font-size: 1.05rem; display: inline-block; transition: transform 0.2s;">
+            체험하기
+          </div>
+        </div>
+        
+        <!-- 수학관 -->
+        <div class="subject-card" style="background: rgba(255,255,255,0.9); border-radius: 24px; padding: 40px 32px; box-shadow: 0 8px 32px rgba(123,110,234,0.12); min-width: 280px; max-width: 320px; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onclick="goToMathExpo()">
+          <div style="font-size: 3.5rem; margin-bottom: 20px;">🔢</div>
+          <h3 style="font-size: 1.4rem; color: #7b6eea; font-weight: bold; margin-bottom: 12px;">수학관 바로가기</h3>
+          <p style="color: #666; font-size: 1rem; line-height: 1.5; margin-bottom: 24px;">
+            직접 조작해 보며 활동하는 비주얼 수학 도구와<br>
+            <strong>개인 맞춤형 학습으로 구성된 교과서</strong>
+          </p>
+          <div class="experience-btn" style="background: linear-gradient(90deg, #7b6eea 0%, #1ec9a8 100%); color: white; padding: 12px 24px; border-radius: 16px; font-weight: bold; font-size: 1.05rem; display: inline-block; transition: transform 0.2s;">
+            체험하기
+          </div>
+        </div>
+      </div>
+      
+      <div style="margin-top: 40px; padding: 24px; background: rgba(255,255,255,0.95); border-radius: 16px; border-left: 4px solid #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+        <p style="color: #333; font-size: 1rem; margin: 0; line-height: 1.6;">
+          <strong style="color: #7b6eea;">영상을 보고도 궁금한 점이 해결되지 않았다면</strong><br>
+          선생님들의 개별 니즈에 맞춘 <strong style="color: #7b6eea;">맞춤형 컨설팅</strong>과 <strong style="color: #7b6eea;">고객센터</strong>를 통해 모든 궁금증을 해결해 드립니다.<br>
+          될 때까지 지원하는 아이스크림 AIDT 지원센터와 함께라면, AI 디지털교과서 더 이상 어렵지 않습니다!
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 롤링 카드 상세 오버레이 -->
+  <div id="rolling-detail-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(30,41,80,0.38); z-index:9999; align-items:center; justify-content:center;">
+    <div id="rolling-detail-modal" style="background:#fff; border-radius:24px; width:90vw; max-width:1200px; height:auto; max-height:95vh; overflow-y:auto; box-shadow:0 8px 48px rgba(30,41,80,0.18); position:relative; padding:48px 24px 36px 24px; display:flex; flex-direction:column; align-items:center; justify-content:center; transform:scale(0.85); opacity:0; transition:transform 0.4s cubic-bezier(.4,1.4,.6,1), opacity 0.4s;">
+      <button id="rolling-detail-close" style="position:absolute; top:18px; right:18px; background:none; border:none; font-size:2rem; color:#7b6eea; cursor:pointer; z-index:2;">&times;</button>
+      <div id="rolling-detail-contents">
+        <!-- 카드별 상세 내용 -->
+        <div class="rolling-detail-item" data-detail-id="ai1" style="display:none;">
+          <h2 style="color:#7b6eea; font-size:1.6rem; font-weight:bold; margin-bottom:18px;">학생 주도형 학습 강화</h2>
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="학생 주도형 학습 아이콘" style="width:90px; margin-bottom:18px;">
+          <p style="color:#444; font-size:1.08rem; line-height:1.7;">조작 활동, 놀이, 프로젝트 중심의 수업 구성과 이야기 중심 단원 도입으로 흥미 유발<br><br>여기에 더 상세한 설명, 예시, 이미지, 동영상 등을 자유롭게 추가할 수 있습니다.</p>
+        </div>
+        <div class="rolling-detail-item" data-detail-id="ai2" style="display:none;">
+          <h2 style="color:#7b6eea; font-size:1.6rem; font-weight:bold; margin-bottom:18px;">학습자의 수준과 발달을 고려한 구성</h2>
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135716.png" alt="수준별 학습 아이콘" style="width:90px; margin-bottom:18px;">
+          <p style="color:#444; font-size:1.08rem; line-height:1.7;">성취 기준에 맞춘 학습량 조절 및 난이도 차등화, 자기주도 학습을 위한 평가 및 피드백<br><br>여기에 더 상세한 설명, 예시, 이미지, 동영상 등을 자유롭게 추가할 수 있습니다.</p>
+        </div>
+        <!-- 나머지 카드 상세는 준비중 -->
+        <div class="rolling-detail-item" data-detail-id="ai3" style="display:none; text-align:center; color:#888; font-size:1.15rem;">준비중입니다.</div>
+        <div class="rolling-detail-item" data-detail-id="ai4" style="display:none; text-align:center; color:#888; font-size:1.15rem;">준비중입니다.</div>
+        <div class="rolling-detail-item" data-detail-id="ai5" style="display:none; text-align:center; color:#888; font-size:1.15rem;">준비중입니다.</div>
+        <div class="rolling-detail-item" data-detail-id="ai6" style="display:none; text-align:center; color:#888; font-size:1.15rem;">준비중입니다.</div>
+        <div class="rolling-detail-item" data-detail-id="ai7" style="display:none; text-align:center; color:#888; font-size:1.15rem; position:relative; min-height:420px;">
+          <button id="ai7-prev-btn" style="display:none; position:absolute; left:32px; top:50%; transform:translateY(-50%); background:#7b6eea; color:#fff; border:none; border-radius:50%; width:48px; height:48px; font-size:2rem; cursor:pointer; box-shadow:0 2px 8px rgba(123,110,234,0.12); display:flex; align-items:center; justify-content:center; z-index:10; pointer-events:auto;">◀</button>
+          <button id="ai7-next-btn" style="position:absolute; right:32px; top:50%; transform:translateY(-50%); background:#7b6eea; color:#fff; border:none; border-radius:50%; width:48px; height:48px; font-size:2rem; cursor:pointer; box-shadow:0 2px 8px rgba(123,110,234,0.12); display:flex; align-items:center; justify-content:center; z-index:10; pointer-events:auto;">▶</button>
+          <div id="ai7-page1" style="display:block;">
+            <h2 style="color:#7b6eea; font-size:1.6rem; font-weight:bold; margin-bottom:18px;">AI 추천 시스템</h2>
+            <img src="recommend.PNG" alt="AI 추천 시스템 예시 이미지" style="max-width:100%; border-radius:16px; margin-bottom:18px; margin-top:10px; box-shadow:0 2px 12px rgba(45,58,140,0.10); display:block; margin-left:auto; margin-right:auto;">
+          </div>
+          <div id="ai7-page2" style="display:none;">
+            <div style="color:#444; font-size:1.08rem; line-height:1.7; margin-top:10px; text-align:left; max-width:700px; margin-left:auto; margin-right:auto;">
+              <b>AI 추천 시스템이란?</b><br>
+              학습자의 이력과 문항 유사성, 협업 필터링 등 다양한 AI 기술을 활용하여<br>
+              학생 개개인에게 맞춤형 문항과 자료를 추천해주는 시스템입니다.<br><br>
+              <b>주요 기능</b><br>
+              - 학습 이력 기반 맞춤형 문항 추천<br>
+              - 유사 문항/자료 자동 탐색 및 제공<br>
+              - 협업 필터링을 통한 학습 패턴 분석<br>
+              - 교사/학생별 추천 결과 리포트 제공<br><br>
+              <b>활용 예시</b><br>
+              1. 학생이 틀린 문제와 유사한 문항을 자동으로 추천<br>
+              2. 학습 패턴을 분석해 취약 개념을 진단하고, 보충 자료를 제안<br>
+              3. 교사는 전체 학급의 추천 결과를 한눈에 확인 가능<br><br>
+              <span style="color:#7b6eea; font-weight:bold;">AI 추천 시스템으로 학생별 맞춤형 학습 경험을 제공합니다!</span>
+            </div>
+          </div>
+        </div>
+        <div class="rolling-detail-item" data-detail-id="ai8" style="display:none; text-align:center; color:#888; font-size:1.15rem;">준비중입니다.</div>
+        <div class="rolling-detail-item" data-detail-id="ai9" style="display:none; text-align:center; color:#888; font-size:1.15rem;">준비중입니다.</div>
+        <div class="rolling-detail-item" data-detail-id="ai10" style="display:none; text-align:center; color:#888; font-size:1.15rem;">준비중입니다.</div>
+        <div class="rolling-detail-item" data-detail-id="ai11" style="display:none; text-align:center; color:#888; font-size:1.15rem;">준비중입니다.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // AI 탭 전환 스크립트
+    const aiTabs = document.querySelectorAll('.ai-tab');
+    const aiPanels = document.querySelectorAll('.ai-tab-panel');
+    aiTabs.forEach(tab => {
+      tab.addEventListener('click', function() {
+        aiTabs.forEach(t => t.classList.remove('active'));
+        aiPanels.forEach(panel => panel.style.display = 'none');
+        this.classList.add('active');
+        document.querySelector('.ai-tab-panel[data-tab="' + this.dataset.tab + '"]').style.display = 'block';
+      });
+    });
+    
+    // 롤링 카드 상세 오버레이(모달) 동작
+    document.querySelectorAll('.glass-btn').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const id = this.getAttribute('data-detail-id');
+        // 모든 상세 숨기기
+        document.querySelectorAll('.rolling-detail-item').forEach(item => item.style.display = 'none');
+        // 해당 상세만 보이기
+        const detail = document.querySelector('.rolling-detail-item[data-detail-id="' + id + '"]');
+        if(detail) detail.style.display = 'block';
+        // 오버레이/모달 열기
+        document.getElementById('rolling-detail-overlay').style.display = 'flex';
+        setTimeout(()=>{
+          document.getElementById('rolling-detail-modal').style.transform='scale(1)';
+          document.getElementById('rolling-detail-modal').style.opacity='1';
+        }, 10);
+        document.body.style.overflow = 'hidden';
+      });
+    });
+    document.getElementById('rolling-detail-close').addEventListener('click', function() {
+      document.getElementById('rolling-detail-modal').style.transform = 'scale(0.85)';
+      document.getElementById('rolling-detail-modal').style.opacity = '0';
+      setTimeout(()=>{
+        document.getElementById('rolling-detail-overlay').style.display = 'none';
+        document.body.style.overflow = '';
+      }, 350);
+    });
+    document.getElementById('rolling-detail-overlay').addEventListener('click', function(e) {
+      if(e.target === this) {
+        document.getElementById('rolling-detail-modal').style.transform = 'scale(0.85)';
+        document.getElementById('rolling-detail-modal').style.opacity = '0';
+        setTimeout(()=>{
+          document.getElementById('rolling-detail-overlay').style.display = 'none';
+          document.body.style.overflow = '';
+        }, 350);
+      }
+    });
+    // 영어관/수학관 체험하기 함수는 기존대로 유지
+    function goToEnglishExpo() {
+      window.location.href = 'web-expo.html?tab=english#exhibition';
+    }
+    function goToMathExpo() {
+      window.location.href = 'web-expo.html?tab=math#exhibition';
+    }
+    // AI 추천 시스템 상세 2페이지 슬라이드 전환 (버튼 위치/표시 보완)
+    (function(){
+      const nextBtn = document.getElementById('ai7-next-btn');
+      const prevBtn = document.getElementById('ai7-prev-btn');
+      const page1 = document.getElementById('ai7-page1');
+      const page2 = document.getElementById('ai7-page2');
+      if(nextBtn && prevBtn && page1 && page2) {
+        nextBtn.style.display = 'flex';
+        prevBtn.style.display = 'none';
+        nextBtn.addEventListener('click', function(e){
+          page1.style.display = 'none';
+          page2.style.display = 'block';
+          nextBtn.style.display = 'none';
+          prevBtn.style.display = 'flex';
+        });
+        prevBtn.addEventListener('click', function(e){
+          page2.style.display = 'none';
+          page1.style.display = 'block';
+          prevBtn.style.display = 'none';
+          nextBtn.style.display = 'flex';
+        });
+      }
+    })();
+  </script>
+
+  <!-- 푸터 -->
+  <footer style="background: #e9ecef; padding: 40px 0 20px 0; margin-top: 60px; border-top: 1px solid #dee2e6;">
+    <div style="max-width: 1400px; margin: 0 auto; padding: 0 20px;">
+      <!-- 회사 정보 -->
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 300px;">
+          <div style="margin-bottom: 20px;">
+            <img src="https://aidt.i-scream.co.kr/assets/images/common/logo_footer.png" alt="아이스크림미디어" style="height: 40px; margin-bottom: 15px;">
+          </div>
+          <div style="color: #6c757d; font-size: 0.9rem; line-height: 1.6;">
+            <p style="margin: 0 0 8px 0;">경기도 성남시 분당구 판교역로 225-20 아이스크림미디어</p>
+            <p style="margin: 0;">ⓒi-Scream Media Corporation. All rights reserved.</p>
+          </div>
+        </div>
+        
+        <!-- 링크 섹션 -->
+        <div style="display: flex; gap: 40px; flex-wrap: wrap;">
+          <div>
+            <h4 style="margin: 0 0 15px 0; font-size: 1rem; color: #495057; font-weight: 600;">회사 정보</h4>
+            <ul style="list-style: none; padding: 0; margin: 0;">
+              <li style="margin-bottom: 8px;">
+                <a href="https://www.i-scream.co.kr" style="color: #6c757d; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;">회사 소개</a>
+              </li>
+            </ul>
+          </div>
+          
+          <div>
+            <h4 style="margin: 0 0 15px 0; font-size: 1rem; color: #495057; font-weight: 600;">관계사 사이트</h4>
+            <ul style="list-style: none; padding: 0; margin: 0;">
+              <li style="margin-bottom: 8px;">
+                <a href="https://www.i-scream.co.kr" style="color: #6c757d; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;">아이스크림미디어</a>
+              </li>
+              <li style="margin-bottom: 8px;">
+                <a href="https://www.dongapub.co.kr" style="color: #6c757d; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;">동아출판</a>
+              </li>
+              <li style="margin-bottom: 8px;">
+                <a href="https://aidt.i-scream.co.kr" style="color: #6c757d; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;">AIDT</a>
+              </li>
+              <li style="margin-bottom: 8px;">
+                <a href="https://www.i-scream.co.kr/training" style="color: #6c757d; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;">연수원</a>
+              </li>
+              <li style="margin-bottom: 8px;">
+                <a href="https://www.semtube.co.kr" style="color: #6c757d; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;">쌤튜브</a>
+              </li>
+              <li style="margin-bottom: 8px;">
+                <a href="https://www.i-scream.co.kr/mall" style="color: #6c757d; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;">아이스크림몰</a>
+              </li>
+              <li style="margin-bottom: 8px;">
+                <a href="https://www.highclass.co.kr" style="color: #6c757d; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;">하이클래스</a>
+              </li>
+              <li style="margin-bottom: 8px;">
+                <a href="https://www.thinkbell.co.kr" style="color: #6c757d; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;">띵커벨</a>
+              </li>
+              <li style="margin-bottom: 8px;">
+                <a href="https://www.classtool.co.kr" style="color: #6c757d; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;">클래스툴</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <style>
+    footer a:hover {
+      color: #1a73e8 !important;
+    }
+    
+    @media (max-width: 768px) {
+      footer {
+        padding: 30px 0 15px 0;
+      }
+      
+      footer > div > div {
+        flex-direction: column;
+        gap: 30px;
+      }
+      
+      footer > div > div > div:first-child {
+        min-width: auto;
+      }
+      
+      footer > div > div > div:last-child {
+        gap: 30px;
+      }
+    }
+  </style>
+  <button class="floating-apply-btn" onclick="location.href='teacher-training.html'">
+    맞춤 교원 연수 신청하세요!
+  </button>
+</body>
+</html> 
